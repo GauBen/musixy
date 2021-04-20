@@ -13,6 +13,8 @@ ctx.lineJoin = 'round'
 const drawPlaylist = (playlist) => {
   const firstMusic = playlist.shift()
 
+  ctx.strokeStyle = 'purple'
+
   ctx.beginPath()
   ctx.moveTo(200 + 200 * firstMusic.x, 200 + 200 * firstMusic.y)
 
@@ -46,6 +48,8 @@ $board.addEventListener('mousedown', (e) => {
 })
 
 const endSegment = () => {
+  ctx.strokeStyle = 'tomato'
+
   ctx.beginPath()
   ctx.moveTo(firstPoint.x, firstPoint.y)
   ctx.lineTo(lastPoint.x, lastPoint.y)
