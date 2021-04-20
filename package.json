@@ -1,7 +1,14 @@
 {
   "name": "musixy",
   "version": "0.0.1",
-  "main": "index.js",
   "author": "GauBen <benaim.gautier@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "build:eleventy": "eleventy --output _pre-dist",
+    "build:parcel": "parcel build '_pre-dist/**/*.html' --dist-dir _dist"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^1.0.0-canary.15",
+    "parcel": "^2.0.0-beta.2"
+  }
 }
