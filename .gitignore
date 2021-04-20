@@ -1,4 +1,4 @@
 node_modules/
 _dist
 _pre-dist
-.parcel-cache
+_parcel-cache
