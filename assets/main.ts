@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import playlist from './playlist.json'
 
 const $board: HTMLCanvasElement = document.querySelector('#board')
@@ -11,6 +12,7 @@ ctx.lineCap = 'round'
 ctx.lineJoin = 'round'
 
 const drawPlaylist = (playlist) => {
+  playlist = playlist.slice()
   const firstMusic = playlist.shift()
 
   ctx.strokeStyle = 'purple'
@@ -24,10 +26,23 @@ const drawPlaylist = (playlist) => {
   ctx.stroke()
 }
 
+const addPlaylistToThePage = (playlist: Array<{x: Number, y: Number, youtube_id: String}>) => {
+  const $playlist = document.querySelector('#playlist')
+
+  $playlist.innerHTML = `
+    <ul>
+      ${playlist.reduce((s, music) => s +
+        `<li><img src="https://i.ytimg.com/vi/${music.youtube_id}/maxresdefault.jpg" alt="Thumbnail" width="64" height="36"> ${music.youtube_id}</li>`
+      , '')}
+    </ul>
+  `
+}
+
 const fetchPlaylist = () => {
   new Promise((resolve, reject) => {
     setTimeout(() => resolve(playlist), 300)
   }).then((value) => {
+    addPlaylistToThePage(value)
     drawPlaylist(value)
   }).catch((reason) => {
     console.log(reason)
