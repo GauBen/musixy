@@ -1,13 +1,8 @@
 [
   {
-    "x": 0.5,
-    "y": 0.3,
-    "youtubeId": "FVFf1-oBl8c"
-  },
-  {
-    "x": 0.2,
-    "y": 0.2,
-    "youtubeId": "Z47pGUpMy-E"
+    "x": -0.5,
+    "y": -0.5,
+    "youtubeId": "cO3UI8T4O5M"
   },
   {
     "x": -0.2,
@@ -15,8 +10,13 @@
     "youtubeId": "hiOkMt7iJ7g"
   },
   {
-    "x": -0.5,
-    "y": -0.5,
-    "youtubeId": "cO3UI8T4O5M"
+    "x": 0.2,
+    "y": 0.2,
+    "youtubeId": "Z47pGUpMy-E"
+  },
+  {
+    "x": 0.5,
+    "y": 0.3,
+    "youtubeId": "FVFf1-oBl8c"
   }
 ]

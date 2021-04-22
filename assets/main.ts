@@ -1,4 +1,4 @@
-import {Marker, Point} from './marker'
+import {Marker, Point, Vector} from './marker'
 import playlist from './playlist.json'
 
 type Playlist = Array<{x: number; y: number; youtubeId: string}>
@@ -56,14 +56,15 @@ class App {
   fetchPlaylist(from: Point, to: Point) {
     this.init()
     this.marker.drawArrow(from, to)
-    const response = new Promise((resolve) => {
+    const response = new Promise<Playlist>((resolve) => {
       setTimeout(() => {
-        resolve(playlist)
+        resolve(playlist as Playlist)
       }, 300)
     })
     response
       .then((playlist: Playlist) => {
-        this.marker.drawPolyLine(playlist)
+        this.drawPlaylist(playlist)
+
         const $playlist = document.querySelector('#playlist')
 
         let html = '<ul>'
@@ -81,6 +82,49 @@ class App {
       .catch((error) => {
         console.warn(error)
       })
+  }
+
+  drawPlaylist(playlist: Playlist) {
+    const vectors = playlist.map((music) => new Vector(music))
+
+    const draw = (time) => {
+      const chain: Vector[] = []
+      let cumulatedLength = 0
+      let previous = vectors[0]
+      chain.push(previous)
+
+      for (const vector of vectors.slice(1)) {
+        const delta = vector.sub(previous)
+        const length = delta.len()
+        cumulatedLength += length
+
+        if (time < cumulatedLength) {
+          chain.push(
+            previous.add(
+              delta.scale((time - cumulatedLength + length) / length)
+            )
+          )
+          break
+        }
+
+        chain.push(vector)
+        previous = vector
+      }
+
+      this.init()
+      this.marker.drawPolyLine(chain)
+      return time < cumulatedLength
+    }
+
+    let start = null
+    const frame = (t) => {
+      if (start === null) start = t
+      if (draw((t - start) * 0.001)) {
+        requestAnimationFrame(frame)
+      }
+    }
+
+    requestAnimationFrame(frame)
   }
 }
 

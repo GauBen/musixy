@@ -15,8 +15,9 @@ export class Vector implements Point {
   readonly x: number
   readonly y: number
 
+  constructor(x: number, y: number)
   constructor(v: Vector | Point)
-  constructor(x: number, y: number) {
+  constructor(x: number | Vector | Point, y: number | undefined = undefined) {
     if (x instanceof Vector || (x instanceof Object && 'x' in x && 'y' in x)) {
       this.x = x.x
       this.y = x.y

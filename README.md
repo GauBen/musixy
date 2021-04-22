@@ -11,3 +11,6 @@ musixy est un projet scolaire de la matière Application Web.
   - [x] Normalisation des coordonnées
   - [x] Abstraction du dessin sur le canvas
 - [x] Continuité : dessin, requête, affichage de la playlist générée
+- [ ] Design
+- [x] Commencer à coder des animations
+- [ ] Concevoir la page de soumission des musiques
