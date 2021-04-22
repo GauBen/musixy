@@ -1,7 +1,21 @@
 import {Marker, Point, Vector} from './marker'
 import playlist from '../playlist.json'
 
-export type Playlist = Array<{x: number; y: number; youtubeId: string}>
+export type Playlist = Array<{
+  x: number
+  y: number
+  youtubeId: string
+  title: string
+  artist: string
+  duration: number
+}>
+
+const escapeHtml = (string: string) =>
+  string
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 
 export class App {
   protected board: HTMLCanvasElement
@@ -67,16 +81,22 @@ export class App {
 
         const $playlist = document.querySelector('#playlist')
 
-        let html = '<ul>'
+        let html = '<div class="wrapper"><ul class="music-list">'
 
         for (const music of playlist) {
-          html += `<li><img src="https://i.ytimg.com/vi/${music.youtubeId}/maxresdefault.jpg" alt="Thumbnail" width="64" height="36"> ${music.youtubeId}</li>`
+          html += `<li class="item playlist-entry">
+            <img class="cover" src="https://i.ytimg.com/vi/${escapeHtml(
+              music.youtubeId
+            )}/maxresdefault.jpg" alt="Thumbnail" width="64" height="36">
+            <span class="title">${escapeHtml(music.title)}</span>
+            <span class="artist">${escapeHtml(music.artist)}</span>
+          </li>`
         }
 
-        html += '</ul>'
-        html += `<a href="http://www.youtube.com/watch_videos?video_ids=${encodeURI(
+        html += '</ul></div>'
+        html += `<p class="youtube-link"><a href="http://www.youtube.com/watch_videos?video_ids=${encodeURI(
           playlist.map((music) => music.youtubeId).join(',')
-        )}">Listen on YouTube</a>`
+        )}">Listen on YouTube</a></p>`
         $playlist.innerHTML = html
       })
       .catch((error) => {

@@ -1,2 +1,64 @@
-canvas
-  border 5px solid grey
+body
+  margin 0
+  font-family 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+
+a
+  color inherit
+
+.page-title
+  font-size 4em
+  margin 1rem 0
+  text-align center
+
+.playlist-generator
+  display flex
+  flex-direction row
+  justify-content center
+
+  > .canvas
+    border 2px solid #444
+
+  > .playlist
+    display flex
+    flex-direction column
+    background #444
+    color #fff
+    width 350px
+    justify-content center
+
+    > .wrapper
+      flex 1
+      overflow auto
+
+.music-list
+  height 0
+  overflow visible
+  list-style none
+  padding 0 1em
+
+  > .item
+    margin 1em 0
+
+.playlist-entry
+  display grid
+  grid-template-columns auto 1fr
+  grid-template-rows 1fr 1fr
+  column-gap 1em
+
+  > .cover
+    grid-column 1
+    grid-row 1 / 3
+    width auto
+    height 2.8em
+
+  > .title
+    font-weight bold
+
+  > .artist
+    opacity 0.8
+
+.youtube-link
+  text-align center
+
+.user-instruction
+  padding 0 2em

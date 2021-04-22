@@ -8,11 +8,13 @@
     <link rel="stylesheet" href="~/assets/design.styl">
   </head>
   <body>
-    <h1>musixy</h1>
-    <div>
-      <canvas id="board"></canvas>
+    <h1 class="page-title">musixy</h1>
+    <div class="playlist-generator">
+      <canvas id="board" class="canvas"></canvas>
+      <div id="playlist" class="playlist">
+        <p class="user-instruction">Click twice on the whiteboard to create a playlist</p>
+      </div>
     </div>
-    <div id="playlist"></div>
     <script src="~/assets/main.ts"></script>
   </body>
 </html>
