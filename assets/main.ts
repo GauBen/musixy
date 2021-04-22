@@ -1,4 +1,4 @@
-import {Marker, Vector} from './marker'
+import {Marker, Point} from './marker'
 
 const $board: HTMLCanvasElement = document.querySelector('#board')
 
@@ -12,7 +12,18 @@ const marker = new Marker($board, {
 
 marker.drawArrow({x: -1, y: 0}, {x: 1, y: 0})
 marker.drawArrow({x: 0, y: -1}, {x: 0, y: 1})
-marker.drawArrow({x: -0.5, y: 0.5}, {x: 0.5, y: -0.3})
 
-const v = new Vector(2, 1)
-console.log(v.x, v.y)
+let lastPoint: Point = null
+
+$board.addEventListener('click', (event) => {
+  const point: Point = marker.fromCanvasPoint({
+    x: event.offsetX,
+    y: event.offsetY
+  })
+  if (lastPoint === null) {
+    lastPoint = point
+  } else {
+    marker.drawArrow(lastPoint, point)
+    lastPoint = null
+  }
+})

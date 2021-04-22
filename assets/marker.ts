@@ -1,4 +1,4 @@
-interface MarkerSettings {
+export interface MarkerSettings {
   x: [number, number]
   y: [number, number]
   width: number
@@ -6,16 +6,16 @@ interface MarkerSettings {
   pixelRatio: number
 }
 
-interface Point {
+export interface Point {
   x: number
   y: number
 }
 
-interface CanvasPoint extends Point {}
-
-export class Vector {
+export class Vector implements Point {
   readonly x: number
   readonly y: number
+
+  constructor(v: Vector | Point)
   constructor(x: number, y: number) {
     if (x instanceof Vector || (x instanceof Object && 'x' in x && 'y' in x)) {
       this.x = x.x
@@ -107,8 +107,8 @@ export class Marker {
   }
 
   drawArrow(from: Point, to: Point) {
-    const canvasFrom = new Vector(this.toCanvasPoint(from))
-    const canvasTo = new Vector(this.toCanvasPoint(to))
+    const canvasFrom = this.toCanvasVector(from)
+    const canvasTo = this.toCanvasVector(to)
     const ctx = this.context
     ctx.beginPath()
     ctx.moveTo(canvasFrom.x, canvasFrom.y)
@@ -130,16 +130,21 @@ export class Marker {
     ctx.fill()
   }
 
-  protected toCanvasPoint(point: Point): CanvasPoint {
-    return {
-      x:
-        ((point.x - this.fromX) / (this.toX - this.fromX)) *
+  toCanvasVector(point: Point): Vector {
+    return new Vector(
+      ((point.x - this.fromX) / (this.toX - this.fromX)) *
         this.width *
         this.pixelRatio,
-      y:
-        ((-point.y - this.fromY) / (this.toY - this.fromY)) *
+      ((-point.y - this.fromY) / (this.toY - this.fromY)) *
         this.height *
         this.pixelRatio
-    }
+    )
+  }
+
+  fromCanvasPoint(point: Point): Vector {
+    return new Vector(
+      (point.x / this.width) * (this.toX - this.fromX) + this.fromX,
+      (1 - point.y / this.height) * (this.toY - this.fromY) + this.fromY
+    )
   }
 }
