@@ -106,6 +106,10 @@ export class Marker {
     this.context.lineWidth = 3 * pixelRatio
   }
 
+  clear() {
+    this.context.clearRect(0, 0, this.width, this.height)
+  }
+
   drawArrow(from: Point, to: Point) {
     const canvasFrom = this.toCanvasVector(from)
     const canvasTo = this.toCanvasVector(to)
@@ -128,6 +132,21 @@ export class Marker {
     ctx.lineTo(secondPoint.x, secondPoint.y)
     ctx.closePath()
     ctx.fill()
+  }
+
+  drawPolyLine(points: Point[]) {
+    const ctx = this.context
+
+    let canvasVector = this.toCanvasVector(points[0])
+    ctx.beginPath()
+    ctx.moveTo(canvasVector.x, canvasVector.y)
+
+    for (const point of points.slice(1)) {
+      canvasVector = this.toCanvasVector(point)
+      ctx.lineTo(canvasVector.x, canvasVector.y)
+    }
+
+    ctx.stroke()
   }
 
   toCanvasVector(point: Point): Vector {
