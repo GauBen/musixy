@@ -73,6 +73,9 @@ class App {
         }
 
         html += '</ul>'
+        html += `<a href="http://www.youtube.com/watch_videos?video_ids=${encodeURI(
+          playlist.map((music) => music.youtubeId).join(',')
+        )}">Listen on YouTube</a>`
         $playlist.innerHTML = html
       })
       .catch((error) => {
