@@ -1,5 +1,5 @@
 import {Marker, Point, Vector} from './marker'
-import playlist from './playlist.json'
+import playlist from '../playlist.json'
 
 export type Playlist = Array<{x: number; y: number; youtubeId: string}>
 
@@ -87,7 +87,7 @@ export class App {
   drawPlaylist(playlist: Playlist) {
     const vectors = playlist.map((music) => new Vector(music))
 
-    const draw = (time) => {
+    const draw = (time: number) => {
       const chain: Vector[] = []
       let cumulatedLength = 0
       let previous = vectors[0]
@@ -101,7 +101,7 @@ export class App {
         if (time < cumulatedLength) {
           chain.push(
             previous.add(
-              delta.scale((time - cumulatedLength + length) / length)
+              delta.scale((time + length - cumulatedLength) / length)
             )
           )
           break
@@ -117,7 +117,7 @@ export class App {
     }
 
     let start = null
-    const frame = (t) => {
+    const frame = (t: number) => {
       if (start === null) start = t
       if (draw((t - start) * 0.001)) {
         requestAnimationFrame(frame)
