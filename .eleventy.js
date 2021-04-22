@@ -6,7 +6,8 @@ module.exports = function(eleventyConfig) {
   })
   return {
     dir: {
-      input: "pages"
+      input: "pages",
+      output: "_pre-dist"
     }
-  };
-};
+  }
+}

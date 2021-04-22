@@ -5,11 +5,11 @@
   "license": "MIT",
   "scripts": {
     "build": "yarn clean && yarn build:eleventy && yarn build:parcel",
-    "build:eleventy": "eleventy --output _pre-dist",
+    "build:eleventy": "eleventy",
     "build:parcel": "PARCEL_WORKERS=0 parcel build '_pre-dist/**/*.html' --dist-dir _dist --cache-dir _parcel-cache",
     "clean": "rimraf _pre-dist _dist",
     "start": "yarn build && npm-run-all --parallel watch:**",
-    "watch:eleventy": "eleventy --serve --output _pre-dist",
+    "watch:eleventy": "eleventy --serve",
     "watch:parcel": "PARCEL_WORKERS=0 parcel serve '_pre-dist/**/*.html' --dist-dir _dist --cache-dir _parcel-cache",
     "test": "xo"
   },
