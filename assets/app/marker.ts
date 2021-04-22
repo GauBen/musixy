@@ -108,7 +108,12 @@ export class Marker {
   }
 
   clear() {
-    this.context.clearRect(0, 0, this.width, this.height)
+    this.context.clearRect(
+      0,
+      0,
+      this.width * this.pixelRatio,
+      this.height * this.pixelRatio
+    )
   }
 
   drawArrow(from: Point, to: Point) {
