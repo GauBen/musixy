@@ -20,8 +20,8 @@ layout: html.njk
   <a href="{{ '/' | url }}">Back to homepage</a>
 </p>
 <script>
-  import {App} from '~assets/app/app'
+  import {ContributeApp} from '~assets/app/app'
 
-  const app = new App(document.querySelector('#board'))
-  app.run2()
+  const app = new ContributeApp(document.querySelector('#board'))
+  app.run()
 </script>

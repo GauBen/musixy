@@ -12,8 +12,8 @@ layout: html.njk
   <a href="{{ '/contribute' | url }}">Add a song</a>
 </p>
 <script>
-  import {App} from '~assets/app/app'
+  import {HomeApp} from '~assets/app/app'
 
-  const app = new App(document.querySelector('#board'))
+  const app = new HomeApp(document.querySelector('#board'))
   app.run()
 </script>

@@ -23,7 +23,7 @@ const escapeHtml = (string: string) =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 
-export class App {
+abstract class App {
   protected board: HTMLCanvasElement
   protected marker: Marker
 
@@ -45,6 +45,12 @@ export class App {
     this.marker.drawArrow({x: 0, y: -1}, {x: 0, y: 1})
   }
 
+  run() {
+    throw new Error('Unimplemented exception')
+  }
+}
+
+export class HomeApp extends App {
   run() {
     let lastPoint: Point = null
 
@@ -71,65 +77,6 @@ export class App {
         this.marker.drawArrow(lastPoint, point)
       }
     })
-  }
-
-  run2() {
-    let point: Point = null
-
-    const $x: HTMLInputElement = document.querySelector('[name=x]')
-    const $y: HTMLInputElement = document.querySelector('[name=y]')
-    const $submit: HTMLButtonElement = document.querySelector('[type=submit]')
-    const $tip: HTMLSpanElement = document.querySelector('#tip')
-    const $form: HTMLFormElement = document.querySelector('form')
-
-    this.board.addEventListener('click', (event) => {
-      this.init()
-      point = this.marker.fromCanvasPoint({
-        x: event.offsetX,
-        y: event.offsetY
-      })
-      this.marker.drawPoint(point)
-      $tip.hidden = true
-      $submit.disabled = false
-      $x.value = point.x.toFixed(3)
-      $y.value = point.y.toFixed(3)
-    })
-
-    $form.addEventListener('submit', (event) => {
-      event.preventDefault()
-      const data: ContributionData = {
-        x: '',
-        y: '',
-        youtubeLink: ''
-      }
-      for (const element of ($form.elements as unknown) as NodeListOf<HTMLInputElement>) {
-        console.log(element)
-        if (element.name in data) {
-          data[element.name] = element.value
-        }
-      }
-
-      this.addMusic(data)
-    })
-  }
-
-  addMusic(data: ContributionData) {
-    const response = new Promise<boolean>((resolve) => {
-      setTimeout(() => {
-        resolve(data instanceof Object)
-      }, 300)
-    })
-    response
-      .then((success) => {
-        if (success) {
-          console.log('Music added')
-        } else {
-          console.log('Music already added')
-        }
-      })
-      .catch((error) => {
-        console.error(error)
-      })
   }
 
   fetchPlaylist(from: Point, to: Point) {
@@ -210,5 +157,66 @@ export class App {
     }
 
     requestAnimationFrame(frame)
+  }
+}
+
+export class ContributeApp extends App {
+  run() {
+    let point: Point = null
+
+    const $x: HTMLInputElement = document.querySelector('[name=x]')
+    const $y: HTMLInputElement = document.querySelector('[name=y]')
+    const $submit: HTMLButtonElement = document.querySelector('[type=submit]')
+    const $tip: HTMLSpanElement = document.querySelector('#tip')
+    const $form: HTMLFormElement = document.querySelector('form')
+
+    this.board.addEventListener('click', (event) => {
+      this.init()
+      point = this.marker.fromCanvasPoint({
+        x: event.offsetX,
+        y: event.offsetY
+      })
+      this.marker.drawPoint(point)
+      $tip.hidden = true
+      $submit.disabled = false
+      $x.value = point.x.toFixed(3)
+      $y.value = point.y.toFixed(3)
+    })
+
+    $form.addEventListener('submit', (event) => {
+      event.preventDefault()
+      const data: ContributionData = {
+        x: '',
+        y: '',
+        youtubeLink: ''
+      }
+      for (const element of ($form.elements as unknown) as NodeListOf<HTMLInputElement>) {
+        console.log(element)
+        if (element.name in data) {
+          data[element.name] = element.value
+        }
+      }
+
+      this.addMusic(data)
+    })
+  }
+
+  addMusic(data: ContributionData) {
+    const response = new Promise<boolean>((resolve) => {
+      setTimeout(() => {
+        resolve(data instanceof Object)
+      }, 300)
+    })
+    response
+      .then((success) => {
+        if (success) {
+          console.log('Music added')
+        } else {
+          console.log('Music already added')
+        }
+      })
+      .catch((error) => {
+        console.error(error)
+      })
   }
 }
