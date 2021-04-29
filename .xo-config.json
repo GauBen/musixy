@@ -1,5 +1,8 @@
 {
   "space": 2,
   "semicolon": false,
-  "prettier": true
+  "prettier": true,
+  "rules": {
+    "no-await-in-loop": "off"
+  }
 }
