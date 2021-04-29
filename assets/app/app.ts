@@ -56,7 +56,7 @@ export class HomeApp extends App {
   async run() {
     let state: state = this.initialState()
     while (true) {
-      const transition = await state
+      const transition: () => state = await state
       state = transition()
     }
   }
