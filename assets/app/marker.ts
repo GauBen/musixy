@@ -137,6 +137,7 @@ export class Marker {
     ctx.lineTo(firstPoint.x, firstPoint.y)
     ctx.lineTo(secondPoint.x, secondPoint.y)
     ctx.closePath()
+    ctx.fillStyle = '#000'
     ctx.fill()
   }
 
@@ -152,6 +153,17 @@ export class Marker {
       ctx.lineTo(canvasVector.x, canvasVector.y)
     }
 
+    ctx.stroke()
+  }
+
+  drawPoint(point: Point) {
+    const ctx = this.context
+
+    const center = this.toCanvasVector(point)
+    ctx.beginPath()
+    ctx.arc(center.x, center.y, 10 * this.pixelRatio, 0, 7, false)
+    ctx.fillStyle = '#fff'
+    ctx.fill()
     ctx.stroke()
   }
 

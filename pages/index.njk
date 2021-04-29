@@ -1,20 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>musixy</title>
-    <link rel="stylesheet" href="~/assets/design.styl">
-  </head>
-  <body>
-    <h1 class="page-title">musixy</h1>
-    <div class="playlist-generator">
-      <canvas id="board" class="canvas"></canvas>
-      <div id="playlist" class="playlist">
-        <p class="user-instruction">Click twice on the whiteboard to create a playlist</p>
-      </div>
-    </div>
-    <script src="~/assets/main.ts"></script>
-  </body>
-</html>
+---
+layout: html.njk
+---
+<h1 class="page-title">musixy</h1>
+<div class="playlist-generator">
+  <canvas id="board" class="canvas"></canvas>
+  <div id="playlist" class="playlist">
+    <p class="user-instruction">Click twice on the whiteboard to create a playlist</p>
+  </div>
+</div>
+<p>
+  <a href="{{ '/contribute' | url }}">Add a song</a>
+</p>
+<script>
+  import {App} from '~assets/app/app'
+
+  const app = new App(document.querySelector('#board'))
+  app.run()
+</script>
