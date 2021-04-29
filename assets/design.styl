@@ -12,8 +12,9 @@ a
 
 .playlist-generator
   display flex
-  flex-direction row
+  flex-direction column
   justify-content center
+  align-items center
 
   > .canvas
     border 2px solid #444
@@ -23,12 +24,20 @@ a
     flex-direction column
     background #444
     color #fff
-    width 350px
     justify-content center
+    min-height 404px
+    width 404px
 
     > .wrapper
       flex 1
       overflow auto
+
+  @media (min-width 800px)
+    flex-direction row
+    align-items stretch
+
+    > .playlist
+      width 350px
 
 .music-list
   height 0
