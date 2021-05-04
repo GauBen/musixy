@@ -1,4 +1,4 @@
-module.exports = function(eleventyConfig) {
+module.exports = (eleventyConfig) => {
   eleventyConfig.setBrowserSyncConfig({
     server: {
       baseDir: '_dist'
@@ -6,8 +6,8 @@ module.exports = function(eleventyConfig) {
   })
   return {
     dir: {
-      input: "pages",
-      output: "_pre-dist"
+      input: 'pages',
+      output: '_pre-dist'
     }
   }
 }
