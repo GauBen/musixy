@@ -15,6 +15,22 @@ export type ContributionData = {
   youtubeLink: string
 }
 
+export type state = Promise<() => state>
+
+export const listen = async <K extends keyof HTMLElementEventMap>(
+  element: HTMLElement,
+  eventName: K
+) =>
+  new Promise<HTMLElementEventMap[K]>((resolve) => {
+    element.addEventListener(
+      eventName,
+      (event) => {
+        resolve(event)
+      },
+      {once: true}
+    )
+  })
+
 export const escapeHtml = (string: string) =>
   string
     .replace(/&/g, '&amp;')
@@ -52,5 +68,3 @@ export abstract class App {
     throw new Error('Unimplemented exception')
   }
 }
-
-export type state = Promise<() => state>
