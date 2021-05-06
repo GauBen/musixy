@@ -1,6 +1,6 @@
 import {Point, Vector} from './marker'
-import playlist from '../playlist.json'
-import {App, state, Playlist, escapeHtml} from './app'
+import staticPlaylist from '../playlist.json'
+import {App, state, Playlist, escapeHtml, listen} from './app'
 
 export class HomeApp extends App {
   async run() {
@@ -13,20 +13,13 @@ export class HomeApp extends App {
 
   async initialState(): state {
     console.log('Etat: initialState')
-    return new Promise((resolve) => {
-      this.board.addEventListener(
-        'click',
-        (event) => {
-          const point: Point = this.marker.fromCanvasPoint({
-            x: event.offsetX,
-            y: event.offsetY
-          })
-          console.log('Transition: initialState -> state2')
-          resolve(async () => this.state2(point))
-        },
-        {once: true}
-      )
+    const event = await listen(this.board, 'click')
+    const point: Point = this.marker.fromCanvasPoint({
+      x: event.offsetX,
+      y: event.offsetY
     })
+    console.log('Transition: initialState -> state2')
+    return async () => this.state2(point)
   }
 
   async state2(lastPoint: Point): state {
@@ -40,45 +33,29 @@ export class HomeApp extends App {
       this.marker.drawArrow(lastPoint, point)
     }
 
-    return new Promise((resolve) => {
-      this.board.addEventListener(
-        'click',
-        (event) => {
-          const point: Point = this.marker.fromCanvasPoint({
-            x: event.offsetX,
-            y: event.offsetY
-          })
-          this.board.removeEventListener('mousemove', drawArrow)
-          console.log('Transition: state2 -> fetchPlaylist')
-          resolve(async () => this.fetchPlaylist(lastPoint, point))
-        },
-        {once: true}
-      )
-      this.board.addEventListener('mousemove', drawArrow)
+    this.board.addEventListener('mousemove', drawArrow)
+
+    const event = await listen(this.board, 'click')
+    const point: Point = this.marker.fromCanvasPoint({
+      x: event.offsetX,
+      y: event.offsetY
     })
+    this.board.removeEventListener('mousemove', drawArrow)
+    console.log('Transition: state2 -> fetchPlaylist')
+    return async () => this.fetchPlaylist(lastPoint, point)
   }
 
   async fetchPlaylist(from: Point, to: Point): state {
     console.log('Etat: fetchPlaylist')
-    return new Promise((resolve) => {
-      this.init()
-      this.marker.drawArrow(from, to)
-      const response = new Promise<Playlist>((resolve) => {
-        setTimeout(() => {
-          resolve(playlist as Playlist)
-        }, 300)
-      })
-      response
-        .then((playlist) => {
-          console.log('Transition: fetchPlaylist -> displayPlaylist')
-          resolve(async () => this.displayPlaylist(from, to, playlist))
-        })
-        .catch((error) => {
-          console.warn(error)
-          console.log('Transition: fetchPlaylist -> initialState')
-          resolve(async () => this.initialState())
-        })
+    this.init()
+    this.marker.drawArrow(from, to)
+    const response = new Promise<Playlist>((resolve) => {
+      setTimeout(() => {
+        resolve(staticPlaylist as Playlist)
+      }, 300)
     })
+    const playlist = await response
+    return async () => this.displayPlaylist(from, to, playlist)
   }
 
   async displayPlaylist(from: Point, to: Point, playlist: Playlist): state {
