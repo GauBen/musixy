@@ -20,7 +20,7 @@ musixy est un projet scolaire de la matière Application Web.
 
 ## Récupérer les infos YouTube sans API key
 
-- Les <meta og:> + <meta itemprop="duration">
+- Les `<meta og:>` + `<meta itemprop="duration">`
 - https://www.youtube.com/oembed?url=https%3A//youtube.com/watch%3Fv%3DhiOkMt7iJ7g&format=json
 - https://noembed.com/
 
