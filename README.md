@@ -15,8 +15,8 @@ musixy est un projet scolaire de la matière Application Web.
 - [x] Commencer à coder des animations
 - [x] Concevoir la page de soumission des musiques
 - [x] Rajouter le texte des axes
-- [ ] Convertir la page de contribution en automate
-- [ ] Refactor
+- [x] Convertir la page de contribution en automate
+- [x] Refactor
 
 ## Récupérer les infos YouTube sans API key
 
