@@ -11,6 +11,8 @@ export interface Point {
   y: number
 }
 
+export type Direction = 'NE' | 'NW' | 'SE' | 'SW'
+
 export class Vector implements Point {
   readonly x: number
   readonly y: number
@@ -165,6 +167,36 @@ export class Marker {
     ctx.fillStyle = '#fff'
     ctx.fill()
     ctx.stroke()
+  }
+
+  drawText(text: string, point: Point, direction: Direction) {
+    const ctx = this.context
+    const margin = 5 * this.pixelRatio
+    const h = 20 * this.pixelRatio
+    ctx.font = `${h}px "Comic sans MS"`
+    const vect = this.toCanvasVector(point)
+    const w = ctx.measureText(text).width
+
+    switch (direction) {
+      case 'NE':
+        ctx.fillText(text, vect.x + margin, vect.y - margin)
+        break
+
+      case 'NW':
+        ctx.fillText(text, vect.x - w - margin, vect.y - margin)
+        break
+
+      case 'SE':
+        ctx.fillText(text, vect.x + margin, vect.y + h + margin)
+        break
+
+      case 'SW':
+        ctx.fillText(text, vect.x - w - margin, vect.y + h + margin)
+        break
+
+      default:
+        throw new Error('Invalid argument for type Direction')
+    }
   }
 
   toCanvasVector(point: Point): Vector {
