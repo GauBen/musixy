@@ -13,10 +13,22 @@ musixy est un projet scolaire de la matière Application Web.
 - [x] Continuité : dessin, requête, affichage de la playlist générée
 - [x] Commencer le design
 - [x] Commencer à coder des animations
-- [ ] Concevoir la page de soumission des musiques
+- [x] Concevoir la page de soumission des musiques
 
 ## Récupérer les infos YouTube sans API key
 
 - Les <meta og:> + <meta itemprop="duration">
 - https://www.youtube.com/oembed?url=https%3A//youtube.com/watch%3Fv%3DhiOkMt7iJ7g&format=json
 - https://noembed.com/
+
+## Comment produire le code de prod
+
+- Installer volta (`curl https://get.volta.sh | bash`)
+- Relancer son shell
+- Installer les dépendances (`yarn install`)
+- Créer le dossier `_dist` (`yarn build`)
+
+Pour lancer le server de développement :
+
+- Tout ce qui se trouve avant
+- `yarn start`
