@@ -1,6 +1,5 @@
 import {Point, Vector} from './marker'
-import staticPlaylist from '../playlist.json'
-import {App, state, Playlist, escapeHtml, listen} from './app'
+import {App, state, Playlist, escapeHtml, listen, API} from './app'
 
 export class HomeApp extends App {
   async run() {
@@ -49,12 +48,20 @@ export class HomeApp extends App {
     console.log('Etat: fetchPlaylist')
     this.init()
     this.marker.drawArrow(from, to)
-    const response = new Promise<Playlist>((resolve) => {
-      setTimeout(() => {
-        resolve(staticPlaylist as Playlist)
-      }, 300)
-    })
-    const playlist = await response
+    const response = await (
+      await fetch(`${API}/make_playlist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from,
+          to,
+          duration: 60 * 20
+        })
+      })
+    ).json()
+    const playlist: Playlist = await response
     return async () => this.displayPlaylist(from, to, playlist)
   }
 

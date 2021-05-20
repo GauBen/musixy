@@ -1,5 +1,5 @@
 import {Point} from './marker'
-import {App, ContributionData, listen, state} from './app'
+import {App, ContributionData, listen, state, API} from './app'
 
 export class ContributeApp extends App {
   async run() {
@@ -58,13 +58,15 @@ export class ContributeApp extends App {
       const event = await listen($form, 'submit')
       event.preventDefault()
       const data: ContributionData = {
-        x: '',
-        y: '',
+        x: 0,
+        y: 0,
         youtubeLink: ''
       }
       for (const element of ($form.elements as unknown) as NodeListOf<HTMLInputElement>) {
         if (element.name in data) {
-          data[element.name] = element.value
+          data[element.name] = ['x', 'y'].includes(element.name)
+            ? element.value
+            : Number(element.value)
         }
       }
 
@@ -75,12 +77,16 @@ export class ContributeApp extends App {
   }
 
   async addMusic(data: ContributionData): state {
-    const response = new Promise<boolean>((resolve) => {
-      setTimeout(() => {
-        resolve(data instanceof Object)
-      }, 300)
-    })
-    const success = await response
+    const response = await (
+      await fetch(`${API}/make_playlist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+    ).json()
+    const {success}: {success: boolean} = await response
     if (success) {
       console.log('Music added')
     } else {

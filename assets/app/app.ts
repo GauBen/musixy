@@ -1,5 +1,7 @@
 import {Marker} from './marker'
 
+export const API = 'http://127.0.0.1:8080'
+
 export type Playlist = Array<{
   x: number
   y: number
@@ -10,8 +12,8 @@ export type Playlist = Array<{
 }>
 
 export type ContributionData = {
-  x: string
-  y: string
+  x: number
+  y: number
   youtubeLink: string
 }
 
