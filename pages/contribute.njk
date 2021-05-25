@@ -4,19 +4,21 @@ layout: html.njk
 <h1 class="page-title">musixy</h1>
 <div class="contribute-form">
   <form action="">
-    <p>Youtube link: <input type="text" name="youtubeLink" size="50" required></p>
+    <p class="long-input">
+      <label for="youtubeLink">Youtube link:</label>
+      <input type="text" name="youtubeLink" id="youtubeLink" size="50" required></p>
     <p>
       <canvas id="board" class="canvas"></canvas>
-    </p>
-    <p>
       <input type="hidden" name="x">
       <input type="hidden" name="y">
+    </p>
+    <p class="_center">
       <button type="submit" disabled>Add song</button>
       <strong id="tip">Click on the board to place the song</strong>
     </p>
   </form>
 </div>
-<p>
+<p class="_center">
   <a href="{{ '/' | url }}">Back to homepage</a>
 </p>
 <script>

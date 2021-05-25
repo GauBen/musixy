@@ -3,12 +3,14 @@ layout: html.njk
 ---
 <h1 class="page-title">musixy</h1>
 <div class="playlist-generator">
-  <canvas id="board" class="canvas"></canvas>
-  <div id="playlist" class="playlist">
-    <p class="user-instruction">Click twice on the whiteboard to create a playlist</p>
+  <div class="wrapper">
+    <canvas id="board" class="canvas"></canvas>
+    <div id="playlist" class="playlist">
+      <p class="user-instruction">Click twice on the whiteboard to create a playlist</p>
+    </div>
   </div>
 </div>
-<p>
+<p class="_center">
   <a href="{{ '/contribute' | url }}">Add a song</a>
 </p>
 <script>

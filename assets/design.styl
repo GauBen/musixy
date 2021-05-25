@@ -1,9 +1,26 @@
+$dark = #444
+$white = #fff
+
+*
+*::before
+*::after
+  box-sizing inherit
+
+html
+  box-sizing border-box
+
 body
   margin 0
   font-family 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
 
 a
   color inherit
+
+canvas
+  background $white
+
+._center
+  text-align center
 
 .page-title
   font-size 4em
@@ -12,32 +29,35 @@ a
 
 .playlist-generator
   display flex
-  flex-direction column
   justify-content center
   align-items center
 
-  > .canvas
-    border 2px solid #444
-
-  > .playlist
+  > .wrapper
+    padding 2px
     display flex
     flex-direction column
-    background #444
-    color #fff
     justify-content center
-    min-height 404px
-    width 404px
-
-    > .wrapper
-      flex 1
-      overflow auto
-
-  @media (min-width 800px)
-    flex-direction row
-    align-items stretch
+    align-items center
+    background $dark
 
     > .playlist
-      width 350px
+      display flex
+      flex-direction column
+      color $white
+      justify-content center
+      min-height 400px
+      width 400px
+
+      > .wrapper
+        flex 1
+        overflow auto
+
+    @media (min-width 800px)
+      flex-direction row
+      align-items stretch
+
+      > .playlist
+        width 350px
 
 .music-list
   height 0
@@ -71,3 +91,17 @@ a
 
 .user-instruction
   padding 0 2em
+
+.contribute-form
+  background $dark
+  color $white
+  overflow hidden
+  max-width 404px
+  padding 2px
+  margin 0 auto
+
+.long-input
+  padding 0 8px
+
+  > input
+    max-width 100%
