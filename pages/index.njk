@@ -2,6 +2,7 @@
 layout: html.njk
 ---
 <h1 class="page-title">musixy</h1>
+{% include 'user.njk' %}
 <div class="playlist-generator">
   <div class="wrapper">
     <canvas id="board" class="canvas"></canvas>
@@ -14,7 +15,7 @@ layout: html.njk
   <a href="{{ '/contribute' | url }}">Add a song</a>
 </p>
 <script>
-  import {HomeApp} from '~assets/app/home-app'
+  import {HomeApp} from '~/assets/app/home-app'
 
   const app = new HomeApp(document.querySelector('#board'))
   app.run()
