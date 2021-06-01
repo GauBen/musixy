@@ -60,7 +60,7 @@ export class ContributeApp extends App {
       const data: ContributionData = {
         x: 0,
         y: 0,
-        youtubeLink: ''
+        youtubeId: ''
       }
       for (const element of ($form.elements as unknown) as NodeListOf<HTMLInputElement>) {
         if (element.name in data) {
@@ -78,7 +78,7 @@ export class ContributeApp extends App {
 
   async addMusic(data: ContributionData): state {
     const response = await (
-      await fetch(`${API}/make_playlist`, {
+      await fetch(`${API}/add_music`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -14,7 +14,7 @@ export type Playlist = Array<{
 export type ContributionData = {
   x: number
   y: number
-  youtubeLink: string
+  youtubeId: string
 }
 
 export type state = Promise<() => state>
