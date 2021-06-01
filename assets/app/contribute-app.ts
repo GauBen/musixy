@@ -1,5 +1,6 @@
 import {Point} from './marker'
 import {App, ContributionData, listen, state, API} from './app'
+import getYoutubeId from 'get-youtube-id'
 
 export class ContributeApp extends App {
   async run() {
@@ -56,18 +57,16 @@ export class ContributeApp extends App {
 
     const send: () => Promise<() => state> = async () => {
       const event = await listen($form, 'submit')
+      const elements = $form.elements as HTMLFormControlsCollection & {
+        x: HTMLInputElement
+        y: HTMLInputElement
+        youtubeLink: HTMLInputElement
+      }
       event.preventDefault()
       const data: ContributionData = {
-        x: 0,
-        y: 0,
-        youtubeId: ''
-      }
-      for (const element of ($form.elements as unknown) as NodeListOf<HTMLInputElement>) {
-        if (element.name in data) {
-          data[element.name] = ['x', 'y'].includes(element.name)
-            ? element.value
-            : Number(element.value)
-        }
+        x: Number(elements.x.value),
+        y: Number(elements.y.value),
+        youtubeId: getYoutubeId(elements.youtubeLink.value)
       }
 
       return async () => this.addMusic(data)
