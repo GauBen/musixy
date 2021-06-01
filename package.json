@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "build": "yarn clean && yarn build:eleventy && yarn build:parcel",
-    "build:eleventy": "eleventy",
-    "build:parcel": "PARCEL_WORKERS=0 parcel build '_pre-dist/**/*.html' --dist-dir _dist --cache-dir _parcel-cache",
+    "build:eleventy": "eleventy --pathprefix '/musixy/'",
+    "build:parcel": "PARCEL_WORKERS=0 parcel build '_pre-dist/**/*.html' --dist-dir _dist --cache-dir _parcel-cache --public-url '/musixy/'",
     "clean": "rimraf _pre-dist _dist",
     "start": "yarn build && npm-run-all --parallel watch:**",
     "watch:eleventy": "eleventy --serve",
