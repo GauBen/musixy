@@ -1,6 +1,6 @@
 import {Marker} from './marker'
 
-export const API = 'http://127.0.0.1:8080'
+export const API = '/musixy/api'
 
 export type Playlist = Array<{
   x: number
