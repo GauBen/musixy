@@ -76,18 +76,15 @@ export class HomeApp extends App {
       request.token = token
     }
 
-    const response = true
-      ? require('../playlist.json')
-      : await (
-          await fetch(`${API}/make_playlist`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(request)
-          })
-        ).json()
-    const playlist: Playlist = await response
+    const playlist: Playlist = await (
+      await fetch(`${API}/make_playlist`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(request)
+      })
+    ).json()
     return async () => this.displayPlaylist(from, to, playlist)
   }
 
@@ -107,7 +104,7 @@ export class HomeApp extends App {
       html += `<li class="item playlist-entry">
           <img class="cover" src="https://i.ytimg.com/vi/${escapeHtml(
             music.youtubeId
-          )}/mqdefault.jpg" alt="Thumbnail" width="64" height="36">
+          )}/mqdefault.jpg" alt="Thumbnail" width="85.33" height="48">
           <span class="title">${escapeHtml(music.title)}</span>
           <span class="artist">${escapeHtml(music.artist)}</span>
         </li>`
