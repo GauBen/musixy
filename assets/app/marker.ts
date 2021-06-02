@@ -119,7 +119,7 @@ export class Marker {
     )
     this.context.lineJoin = 'round'
     this.context.lineCap = 'round'
-    this.context.lineWidth = 2
+    this.context.lineWidth = 2 * this.pixelRatio
     this.context.fillStyle = '#000'
     this.context.strokeStyle = '#000'
   }
