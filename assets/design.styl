@@ -1,5 +1,7 @@
 $dark = #444
 $white = #fff
+$shadow = 0 2px 5px #889
+$radius = 4px
 
 *
 *::before
@@ -33,17 +35,19 @@ canvas
   align-items center
 
   > .wrapper
-    padding 2px
     display flex
     flex-direction column
     justify-content center
     align-items center
-    background $dark
+    box-shadow $shadow
+    border-radius $radius
+
+    > .selector
+      padding 1em
 
     > .playlist
       display flex
       flex-direction column
-      color $white
       justify-content center
       min-height 400px
       width 400px
