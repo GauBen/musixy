@@ -168,7 +168,11 @@ export class Marker {
     ctx.stroke()
   }
 
-  drawPoint(point: Point, radius = 10) {
+  drawPoint(
+    point: Point,
+    radius = 10,
+    color: string | CanvasGradient | CanvasPattern = null
+  ) {
     const ctx = this.context
 
     const center = this.toCanvasVector(point)
@@ -176,6 +180,8 @@ export class Marker {
     ctx.arc(center.x, center.y, radius * this.pixelRatio, 0, 7, false)
     ctx.fillStyle = '#fff'
     ctx.fill()
+    ctx.strokeStyle = color
+    ctx.lineWidth = (radius / 2.5) * this.pixelRatio
     ctx.stroke()
   }
 

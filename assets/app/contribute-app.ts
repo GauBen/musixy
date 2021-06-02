@@ -41,7 +41,7 @@ export class ContributeApp extends App {
     const $form: HTMLFormElement = document.querySelector('form')
 
     this.init()
-    this.marker.drawPoint(point)
+    this.marker.drawPoint(point, 10, '#f00')
     $tip.hidden = true
     $submit.disabled = false
     $x.value = point.x.toFixed(3)
