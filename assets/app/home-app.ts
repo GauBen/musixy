@@ -30,18 +30,15 @@ export class HomeApp extends App {
   }
 
   async initialState(): state {
-    console.log('Etat: initialState')
     const event = await listen(this.board, 'click')
     const point: Point = this.marker.fromCanvasPoint({
       x: event.offsetX,
       y: event.offsetY
     })
-    console.log('Transition: initialState -> state2')
     return async () => this.state2(point)
   }
 
   async state2(lastPoint: Point): state {
-    console.log('Etat: state2')
     const drawArrow = (event: MouseEvent) => {
       const point: Point = this.marker.fromCanvasPoint({
         x: event.offsetX,
@@ -59,12 +56,10 @@ export class HomeApp extends App {
       y: event.offsetY
     })
     this.board.removeEventListener('mousemove', drawArrow)
-    console.log('Transition: state2 -> fetchPlaylist')
     return async () => this.fetchPlaylist(lastPoint, point)
   }
 
   async fetchPlaylist(from: Point, to: Point): state {
-    console.log('Etat: fetchPlaylist')
     this.init()
     this.marker.drawArrow(from, to)
     const request: MakePlaylistData = {
@@ -89,7 +84,6 @@ export class HomeApp extends App {
   }
 
   async displayPlaylist(from: Point, to: Point, playlist: Playlist): state {
-    console.log('Etat: displayPlaylist')
     const $playlist = document.querySelector('#playlist')
 
     if (playlist.length === 0) {
@@ -116,12 +110,10 @@ export class HomeApp extends App {
     )}" target="_blank" rel="noopener">Listen on YouTube</a></p>`
     $playlist.innerHTML = html
 
-    console.log('Transition: displayPlaylist -> drawPlaylist')
     return async () => this.drawPlaylist(from, to, playlist)
   }
 
   async drawPlaylist(from: Point, to: Point, playlist: Playlist): state {
-    console.log('Etat: drawPlaylist')
     return new Promise((resolve) => {
       const vectors = playlist.map((music) => new Vector(music))
 
@@ -164,7 +156,6 @@ export class HomeApp extends App {
         if (draw((t - start) * 0.001)) {
           requestAnimationFrame(frame)
         } else {
-          console.log('Transition: displayPlaylist -> initialState')
           resolve(async () => this.initialState())
         }
       }
