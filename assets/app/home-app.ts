@@ -85,7 +85,7 @@ export class HomeApp extends App {
       html += `<li class="item playlist-entry">
           <img class="cover" src="https://i.ytimg.com/vi/${escapeHtml(
             music.youtubeId
-          )}/maxresdefault.jpg" alt="Thumbnail" width="64" height="36">
+          )}/mqdefault.jpg" alt="Thumbnail" width="64" height="36">
           <span class="title">${escapeHtml(music.title)}</span>
           <span class="artist">${escapeHtml(music.artist)}</span>
         </li>`
