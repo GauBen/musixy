@@ -4,10 +4,10 @@ layout: html.njk
 <h1 class="page-title">musixy</h1>
 {% include 'user.njk' %}
 <div class="contribute-form">
-  <form action="">
+  <form action="" class="wrapper">
     <p class="long-input">
       <label for="youtubeLink">Youtube link:</label>
-      <input type="text" name="youtubeLink" id="youtubeLink" size="50" required></p>
+      <input type="text" name="youtubeLink" id="youtubeLink" required></p>
     <p>
       <canvas id="board" class="canvas"></canvas>
       <input type="hidden" name="x">

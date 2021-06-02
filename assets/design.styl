@@ -99,12 +99,15 @@ canvas
   padding 0 2em
 
 .contribute-form
-  background $dark
-  color $white
-  overflow hidden
-  max-width 404px
-  padding 2px
-  margin 0 auto
+  display flex
+  align-items center
+  justify-content center
+
+  > .wrapper
+    box-shadow $shadow
+    border-radius $radius
+    padding 0 0.5em
+    margin 0 auto
 
 .long-input
   padding 0 8px
@@ -127,7 +130,9 @@ canvas
   max-width 300px
   margin auto
   overflow hidden
-  border 2px solid $dark
+  box-shadow $shadow
+  border-radius $radius
+  padding 0 0.5em
 
   > h2
     padding 0 8px
