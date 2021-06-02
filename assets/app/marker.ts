@@ -122,12 +122,12 @@ export class Marker {
     const canvasFrom = this.toCanvasVector(from)
     const canvasTo = this.toCanvasVector(to)
     const ctx = this.context
+    const arrow = canvasTo.sub(canvasFrom).normalize()
     ctx.beginPath()
     ctx.moveTo(canvasFrom.x, canvasFrom.y)
-    ctx.lineTo(canvasTo.x, canvasTo.y)
+    ctx.lineTo(canvasTo.x - arrow.x * 10, canvasTo.y - arrow.y * 10)
     ctx.stroke()
 
-    const arrow = canvasTo.sub(canvasFrom).normalize()
     ctx.beginPath()
     ctx.moveTo(canvasTo.x, canvasTo.y)
     const firstPoint = canvasTo.add(
