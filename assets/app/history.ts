@@ -8,12 +8,12 @@ const main = async () => {
   }
 
   const response: Playlist[] = await (
-    await fetch(`${API}/history`, {
+    await fetch(`${API}/user_playlists`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({username: user})
+      body: JSON.stringify({name: user.name})
     })
   ).json()
   let html = ''
