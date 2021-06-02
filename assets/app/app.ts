@@ -58,12 +58,12 @@ export abstract class App {
 
   init() {
     this.marker.clear()
-    this.marker.drawArrow({x: -1, y: 0}, {x: 1, y: 0})
-    this.marker.drawArrow({x: 0, y: -1}, {x: 0, y: 1})
-    this.marker.drawText('Sad', {x: 0, y: -1}, 'NW')
-    this.marker.drawText('Happy', {x: 0, y: 1}, 'SW')
+    this.marker.drawArrow({x: -0.98, y: 0}, {x: 0.98, y: 0})
+    this.marker.drawArrow({x: 0, y: -0.98}, {x: 0, y: 0.98})
+    this.marker.drawText('Sad', {x: -0.03, y: -1}, 'NW')
+    this.marker.drawText('Happy', {x: -0.06, y: 1}, 'SW')
     this.marker.drawText('Calm', {x: -1, y: 0}, 'SE')
-    this.marker.drawText('Energetic', {x: 1, y: 0}, 'SW')
+    this.marker.drawText('Energetic', {x: 0.9, y: 0}, 'SW')
   }
 
   run() {
