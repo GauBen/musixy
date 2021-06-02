@@ -5,7 +5,19 @@ layout: html.njk
 {% include 'user.njk' %}
 <div class="playlist-generator">
   <div class="wrapper">
-    <canvas id="board" class="canvas"></canvas>
+    <div class="selector">
+      <canvas id="board" class="canvas"></canvas>
+      <div class="slider-and-tooltip">
+        <input type="range" name="duration" id="duration" step="5" min="15" max="60" list="ticks" value="30">
+        <datalist id="ticks">
+          <option value="15"></option>
+          <option value="30"></option>
+          <option value="45"></option>
+          <option value="60"></option>
+        </datalist>
+        <span class="tooltip" id="duration-tooltip">30 min</span>
+      </div>
+    </div>
     <div id="playlist" class="playlist">
       <p class="user-instruction">Click twice on the whiteboard to create a playlist</p>
     </div>

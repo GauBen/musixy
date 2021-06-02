@@ -2,12 +2,22 @@ import {Point, Vector} from './marker'
 import {App, state, Playlist, escapeHtml, listen, API} from './app'
 
 export class HomeApp extends App {
+  $duration: HTMLInputElement
   async run() {
+    this.setupSlider()
     let state: state = this.initialState()
     while (true) {
       const transition: () => state = await state
       state = transition()
     }
+  }
+
+  setupSlider() {
+    this.$duration = document.querySelector('#duration')
+    const $tooltip = document.querySelector('#duration-tooltip')
+    this.$duration.addEventListener('input', () => {
+      $tooltip.innerHTML = `${this.$duration.value} min`
+    })
   }
 
   async initialState(): state {
