@@ -76,15 +76,17 @@ export class HomeApp extends App {
       request.token = token
     }
 
-    const response = await (
-      await fetch(`${API}/make_playlist`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(request)
-      })
-    ).json()
+    const response = true
+      ? require('../playlist.json')
+      : await (
+          await fetch(`${API}/make_playlist`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
+          })
+        ).json()
     const playlist: Playlist = await response
     return async () => this.displayPlaylist(from, to, playlist)
   }

@@ -16,6 +16,7 @@ layout: html.njk
     <p class="_center">
       <button type="submit">Log in</button>
     </p>
+    <p class="error-message" id="login-error" hidden>Hello world!</p>
   </form>
   <hr>
   <form action="#" id="register-form">
@@ -31,8 +32,12 @@ layout: html.njk
     <p class="_center">
       <button type="submit">Register</button>
     </p>
+    <p class="error-message" id="register-error" hidden>Hello world!</p>
   </form>
 </div>
 <p class="_center">
   <a href="{{ '/' | url }}">Back to homepage</a>
 </p>
+<script>
+  import '~/assets/app/login.ts'
+</script>
