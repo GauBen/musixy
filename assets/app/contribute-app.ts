@@ -58,16 +58,22 @@ export class ContributeApp extends App {
 
     const send: () => Promise<() => state> = async () => {
       const event = await listen($form, 'submit')
+      event.preventDefault()
+
       const elements = $form.elements as HTMLFormControlsCollection & {
         x: HTMLInputElement
         y: HTMLInputElement
         youtubeLink: HTMLInputElement
       }
-      event.preventDefault()
+      const youtubeId = getYoutubeId(elements.youtubeLink.value)
+      if (youtubeId === null) {
+        return async () => this.readyToSendState(point)
+      }
+
       const data: ContributionData = {
         x: Number(elements.x.value),
         y: Number(elements.y.value),
-        youtubeId: getYoutubeId(elements.youtubeLink.value)
+        youtubeId
       }
       if (token !== null) {
         data.token = token
