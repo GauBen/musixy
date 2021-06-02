@@ -94,6 +94,7 @@ export class Marker {
     this.toY = toY
 
     this.resize(width, height, pixelRatio)
+    this.clear()
   }
 
   resize(width: number, height: number, pixelRatio: number) {
@@ -116,6 +117,11 @@ export class Marker {
       this.width * this.pixelRatio,
       this.height * this.pixelRatio
     )
+    this.context.lineJoin = 'round'
+    this.context.lineCap = 'round'
+    this.context.lineWidth = 2
+    this.context.fillStyle = '#000'
+    this.context.strokeStyle = '#000'
   }
 
   drawArrow(from: Point, to: Point) {
@@ -173,7 +179,7 @@ export class Marker {
     const ctx = this.context
     const margin = 5 * this.pixelRatio
     const h = 20 * this.pixelRatio
-    ctx.font = `${h}px "Comic sans MS"`
+    ctx.font = `${h}px "Segoe UI"`
     const vect = this.toCanvasVector(point)
     const w = ctx.measureText(text).width
 
