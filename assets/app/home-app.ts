@@ -67,7 +67,7 @@ export class HomeApp extends App {
         body: JSON.stringify({
           from,
           to,
-          duration: 60 * 20
+          duration: 60 * Number(this.$duration.value)
         })
       })
     ).json()
