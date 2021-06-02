@@ -56,18 +56,17 @@ hr
       flex-direction column
       justify-content center
       min-height 400px
+      min-width 400px
       align-self stretch
 
       > .wrapper
         flex 1
         overflow auto
+        position relative
 
-    @media (min-width 800px)
+    @media (min-width 864px)
       flex-direction row
       align-items stretch
-
-      > .playlist
-        width 350px
 
 .music-list
   height 0
@@ -75,6 +74,7 @@ hr
   padding 0 1em
   overflow visible
   list-style none
+  position absolute
 
   > .item
     margin 0
@@ -94,9 +94,15 @@ hr
 
   > .title
     font-weight bold
+    white-space nowrap
+    text-overflow ellipsis
+    overflow hidden
 
   > .artist
     opacity 0.8
+    white-space nowrap
+    text-overflow ellipsis
+    overflow hidden
 
 .youtube-link
   text-align center
