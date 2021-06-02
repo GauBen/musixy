@@ -2,20 +2,37 @@
 layout: html.njk
 ---
 <h1 class="page-title">musixy</h1>
-<form action="#" id="login-form" class="login-form">
-  <h2>Log in</h2>
-  <p class="long-input">
-    <label for="username">User name:</label>
-    <input type="text" id="username" name="username">
-  </p>
-  <p class="long-input">
-    <label for="username">Password:</label>
-    <input type="password" id="password" name="password">
-  </p>
-  <p class="_center">
-    <button type="submit">Log in</button>
-  </p>
-</form>
+<div class="login-form">
+  <form action="#" id="login-form">
+    <h2>Log in</h2>
+    <p class="long-input">
+      <label for="username">User name:</label>
+      <input type="text" id="username" name="username">
+    </p>
+    <p class="long-input">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password">
+    </p>
+    <p class="_center">
+      <button type="submit">Log in</button>
+    </p>
+  </form>
+  <hr>
+  <form action="#" id="register-form">
+    <h2>Register</h2>
+    <p class="long-input">
+      <label for="new-username">User name:</label>
+      <input type="text" id="new-username" name="username">
+    </p>
+    <p class="long-input">
+      <label for="new-password">Password:</label>
+      <input type="password" id="new-password" name="password">
+    </p>
+    <p class="_center">
+      <button type="submit">Register</button>
+    </p>
+  </form>
+</div>
 <p class="_center">
   <a href="{{ '/' | url }}">Back to homepage</a>
 </p>
