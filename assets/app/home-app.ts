@@ -94,7 +94,7 @@ export class HomeApp extends App {
     html += '</ul></div>'
     html += `<p class="youtube-link"><a href="http://www.youtube.com/watch_videos?video_ids=${encodeURI(
       playlist.map((music) => music.youtubeId).join(',')
-    )}">Listen on YouTube</a></p>`
+    )}" target="_blank" rel="noopener">Listen on YouTube</a></p>`
     $playlist.innerHTML = html
 
     console.log('Transition: displayPlaylist -> drawPlaylist')
