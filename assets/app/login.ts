@@ -16,7 +16,7 @@ $loginForm.addEventListener('submit', async (event) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        username: $loginUser.value,
+        name: $loginUser.value,
         password: $loginPassword.value
       })
     })
@@ -51,7 +51,7 @@ $registerForm.addEventListener('submit', async (event) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        username: $registerUser.value,
+        name: $registerUser.value,
         password: $registerPassword.value
       })
     })
