@@ -2,7 +2,11 @@ import {API, escapeHtml, Playlist} from './app'
 import {user} from './user'
 
 const main = async () => {
-  if (user === null) return
+  if (user === null) {
+    location.href = '../login/'
+    return
+  }
+
   const response: Playlist[] = await (
     await fetch(`${API}/history`, {
       method: 'POST',
