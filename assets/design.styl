@@ -2,6 +2,7 @@ $dark = #444
 $white = #fff
 $shadow = 0 2px 5px #889
 $radius = 4px
+$link = #000
 
 *
 *::before
@@ -17,7 +18,28 @@ body
   line-height 1.5
 
 a
-  color inherit
+  $line = 1px
+  display inline
+  padding-bottom 2 * $line
+  color $link
+  text-decoration none
+  background-image linear-gradient($link, $link), linear-gradient($link, $link)
+  background-repeat no-repeat, no-repeat
+  background-position bottom left, bottom right
+  background-size 100% $line, 0% (2 * $line)
+  transition 0.2s color, 0.2s background-size
+  border-radius 2 * $line
+
+  &:hover
+    background-position bottom left, bottom left
+    background-size 100% $line, 100% (2 * $line)
+
+  &:focus
+  &:active
+    color $white
+    background-position bottom left, bottom left
+    background-size 100% 100%, 0% (2 * $line)
+    outline none
 
 canvas
   background $white
@@ -133,7 +155,7 @@ hr
   justify-content center
 
   > .text
-    padding 0 1em 1em
+    padding 0 3em 1em
     border-bottom 2px solid $dark
     text-align center
 
