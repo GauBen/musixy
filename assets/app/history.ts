@@ -22,9 +22,9 @@ const main = async () => {
     const first = playlist[0]
     const last = playlist[playlist.length - 1]
     html += `<div class="entry">
-      <svg class="image" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="48" height="48" viewBox="-1 -1 2 2" xml:space="preserve" style="stroke-width:.09;stroke-linecap:round">
-        <line style="stroke:#000;" x1="-.95" y1="0" x2=".95" y2="0"/>
-        <line style="stroke:#000" x1="0" y1="-.95" x2="0" y2=".95"/>
+      <svg class="image" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="48" height="48" viewBox="-1.2 -1.2 2.4 2.4" xml:space="preserve" style="stroke-width:.1;stroke-linecap:round">
+        <line style="stroke:#000;" x1="-1.1" y1="0" x2="1.1" y2="0"/>
+        <line style="stroke:#000" x1="0" y1="-1.1" x2="0" y2="1.1"/>
         <line style="stroke:#f00" x1="${first.x}" y1="${-first.y}" x2="${
       last.x
     }" y2="${-last.y}"/>
