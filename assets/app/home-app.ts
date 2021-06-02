@@ -79,6 +79,12 @@ export class HomeApp extends App {
     console.log('Etat: displayPlaylist')
     const $playlist = document.querySelector('#playlist')
 
+    if (playlist.length === 0) {
+      $playlist.innerHTML =
+        '<p class="user-instruction"><strong>Error:</strong> the server created an empty playlist. Please retry later.</p>'
+      return async () => this.initialState()
+    }
+
     let html = '<div class="wrapper"><ul class="music-list">'
 
     for (const music of playlist) {
