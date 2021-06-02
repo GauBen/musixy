@@ -24,7 +24,7 @@ $loginForm.addEventListener('submit', async (event) => {
 
   if (response.success) {
     login($loginUser.value, response.token)
-    location.href = '.'
+    location.href = '..'
     return
   }
 
