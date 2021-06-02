@@ -1,4 +1,4 @@
-import {Marker} from './marker'
+import {Marker, Point} from './marker'
 
 export const API = '/musixy/api'
 
@@ -15,6 +15,14 @@ export type ContributionData = {
   x: number
   y: number
   youtubeId: string
+  token?: string
+}
+
+export type MakePlaylistData = {
+  from: Point
+  to: Point
+  duration: number
+  token?: string
 }
 
 export type state = Promise<() => state>

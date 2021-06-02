@@ -1,6 +1,7 @@
 import {Point} from './marker'
 import {App, ContributionData, listen, state, API} from './app'
 import getYoutubeId from 'get-youtube-id'
+import {token} from './user'
 
 export class ContributeApp extends App {
   async run() {
@@ -67,6 +68,9 @@ export class ContributeApp extends App {
         x: Number(elements.x.value),
         y: Number(elements.y.value),
         youtubeId: getYoutubeId(elements.youtubeLink.value)
+      }
+      if (token !== null) {
+        data.token = token
       }
 
       return async () => this.addMusic(data)
