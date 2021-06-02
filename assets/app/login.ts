@@ -40,6 +40,9 @@ const $registerPassword: HTMLInputElement = document.querySelector(
 const $registerError: HTMLParagraphElement = document.querySelector(
   '#register-error'
 )
+const $registerSuccess: HTMLParagraphElement = document.querySelector(
+  '#register-success'
+)
 
 $registerForm.addEventListener('submit', async (event) => {
   event.preventDefault()
@@ -59,7 +62,9 @@ $registerForm.addEventListener('submit', async (event) => {
 
   if (response.success) {
     login($loginUser.value, response.token)
-    location.href = '.'
+    $registerUser.value = ''
+    $registerPassword.value = ''
+    $registerSuccess.hidden = false
     return
   }
 

@@ -33,6 +33,9 @@ layout: html.njk
       <button type="submit">Register</button>
     </p>
     <p class="error-message" id="register-error" hidden>Hello world!</p>
+    <p class="success-message" id="register-success" hidden>Account created!<br>
+      <a href="{{ '/' | url }}">Homepage</a> · <a href="{{ '/contribute/' | url }}">Contribute</a>
+    </p>
   </form>
 </div>
 <p class="_center">
