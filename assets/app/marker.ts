@@ -149,7 +149,10 @@ export class Marker {
     ctx.fill()
   }
 
-  drawPolyLine(points: Point[]) {
+  drawPolyLine(
+    points: Point[],
+    color: string | CanvasGradient | CanvasPattern = null
+  ) {
     const ctx = this.context
 
     let canvasVector = this.toCanvasVector(points[0])
@@ -161,15 +164,16 @@ export class Marker {
       ctx.lineTo(canvasVector.x, canvasVector.y)
     }
 
+    ctx.strokeStyle = color
     ctx.stroke()
   }
 
-  drawPoint(point: Point) {
+  drawPoint(point: Point, radius = 10) {
     const ctx = this.context
 
     const center = this.toCanvasVector(point)
     ctx.beginPath()
-    ctx.arc(center.x, center.y, 10 * this.pixelRatio, 0, 7, false)
+    ctx.arc(center.x, center.y, radius * this.pixelRatio, 0, 7, false)
     ctx.fillStyle = '#fff'
     ctx.fill()
     ctx.stroke()

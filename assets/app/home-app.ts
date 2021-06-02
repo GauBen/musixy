@@ -116,6 +116,7 @@ export class HomeApp extends App {
         const chain: Vector[] = []
         let cumulatedLength = 0
         let previous = vectors[0]
+        const dots = [previous]
         chain.push(previous)
 
         for (const vector of vectors.slice(1)) {
@@ -132,13 +133,15 @@ export class HomeApp extends App {
             break
           }
 
+          dots.push(vector)
           chain.push(vector)
           previous = vector
         }
 
         this.init()
         this.marker.drawArrow(from, to)
-        this.marker.drawPolyLine(chain)
+        this.marker.drawPolyLine(chain, '#F00')
+        for (const dot of dots) this.marker.drawPoint(dot, 4)
         return time < cumulatedLength
       }
 
