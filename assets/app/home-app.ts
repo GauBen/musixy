@@ -164,3 +164,6 @@ export class HomeApp extends App {
     })
   }
 }
+
+const app = new HomeApp(document.querySelector('#board'))
+void app.run()

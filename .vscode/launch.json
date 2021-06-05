@@ -4,12 +4,12 @@
     {
       "type": "pwa-msedge",
       "request": "launch",
-      "name": "Launch Edge against localhost",
-      "url": "http://localhost:8080",
+      "name": "Edge",
+      "url": "http://localhost:1234",
       "webRoot": "${workspaceFolder}",
       "sourceMapPathOverrides": {
         "/__parcel_source_root/*": "${workspaceFolder}/*"
-      },
+      }
     }
   ]
 }
