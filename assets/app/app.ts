@@ -1,7 +1,5 @@
 import {Marker, Point} from './marker'
 
-export const API = '/musixy/api'
-
 export type Playlist = Array<{
   x: number
   y: number

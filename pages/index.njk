@@ -2,7 +2,6 @@
 layout: html.njk
 ---
 <h1 class="page-title">musixy</h1>
-{% include 'user.njk' %}
 <div class="playlist-generator">
   <div class="wrapper">
     <div class="selector">
@@ -24,6 +23,6 @@ layout: html.njk
   </div>
 </div>
 <p class="_center">
-  <a href="{{ '/contribute' | url }}">Add a song</a>
+  <a href="{{ '/history/' | url }}">History</a>
 </p>
-<script src='~/assets/app/home-app'></script>
+<script src="~/assets/app/home-app"></script>

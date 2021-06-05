@@ -2,7 +2,6 @@
 layout: html.njk
 ---
 <h1 class="page-title">musixy</h1>
-{% include 'user.njk' %}
 <div class="playlist-history" id="playlist-history">
   <p>
     <strong>Loading...</strong>
@@ -11,6 +10,4 @@ layout: html.njk
 <p class="_center">
   <a href="{{ '/' | url }}">Back to homepage</a>
 </p>
-<script>
-  import '~/assets/app/history.ts'
-</script>
+<script src="~/assets/app/history.ts"></script>

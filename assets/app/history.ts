@@ -1,21 +1,8 @@
-import {API, escapeHtml, Playlist} from './app'
-import {user} from './user'
+import {escapeHtml, Playlist} from './app'
+import playlist from '../playlist.json'
 
 const main = async () => {
-  if (user === null) {
-    location.href = '../login/'
-    return
-  }
-
-  const response: Playlist[] = await (
-    await fetch(`${API}/user_playlists`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({name: user.name})
-    })
-  ).json()
+  const response: Playlist[] = [playlist]
   let html = ''
   for (const playlist of response) {
     if (playlist.length < 2) continue

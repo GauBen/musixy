@@ -1,14 +1,6 @@
 import {Point, Vector} from './marker'
-import {
-  App,
-  state,
-  Playlist,
-  escapeHtml,
-  listen,
-  API,
-  MakePlaylistData
-} from './app'
-import {token} from './user'
+import {App, state, Playlist, escapeHtml, listen} from './app'
+import playlist from '../playlist.json'
 
 export class HomeApp extends App {
   $duration: HTMLInputElement
@@ -62,25 +54,7 @@ export class HomeApp extends App {
   async fetchPlaylist(from: Point, to: Point): state {
     this.init()
     this.marker.drawArrow(from, to)
-    const request: MakePlaylistData = {
-      from,
-      to,
-      duration: 60 * Number(this.$duration.value)
-    }
-    if (token !== null) {
-      request.token = token
-    }
-
-    const playlist: Playlist = await (
-      await fetch(`${API}/make_playlist`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(request)
-      })
-    ).json()
-    return async () => this.displayPlaylist(from, to, playlist)
+    return async () => this.displayPlaylist(from, to, playlist as Playlist)
   }
 
   async displayPlaylist(from: Point, to: Point, playlist: Playlist): state {
