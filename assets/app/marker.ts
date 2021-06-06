@@ -30,11 +30,22 @@ export class Vector implements Point {
     this.y = y
   }
 
-  add(v: Vector) {
+  static orthographicProjection(
+    startPoint: Point,
+    endPoint: Point,
+    projectile: Point
+  ) {
+    const v = new Vector(endPoint).sub(startPoint).normalize()
+    return new Vector(
+      v.scale(new Vector(projectile).sub(startPoint).dot(v))
+    ).add(startPoint)
+  }
+
+  add(v: Point) {
     return new Vector(this.x + v.x, this.y + v.y)
   }
 
-  sub(v: Vector) {
+  sub(v: Point) {
     return new Vector(this.x - v.x, this.y - v.y)
   }
 
@@ -57,8 +68,17 @@ export class Vector implements Point {
     return Math.sqrt(this.len2())
   }
 
+  dot(v: Point) {
+    return v.x * this.x + v.y * this.y
+  }
+
   normalize() {
-    return new Vector(this.x / this.len(), this.y / this.len())
+    const length = this.len()
+    if (length < Number.EPSILON || !length) {
+      throw new Error('Division by zero')
+    }
+
+    return new Vector(this.x / length, this.y / length)
   }
 }
 

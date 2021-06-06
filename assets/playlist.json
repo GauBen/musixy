@@ -54,5 +54,29 @@
     "title": "Reason",
     "artist": "Matthew Chaim",
     "duration": 201
+  },
+  {
+    "x": 0.9,
+    "y": 0.9,
+    "youtubeId": "dQw4w9WgXcQ",
+    "title": "Never Gonna Give You Up",
+    "artist": "Rick Astley",
+    "duration": 212
+  },
+  {
+    "x": 0.95,
+    "y": 0.5,
+    "youtubeId": "UkkdaPxRR1k",
+    "title": "Upload Your Mind :: Download My Soul",
+    "artist": "Camellia",
+    "duration": 134
+  },
+  {
+    "x": 0.4,
+    "y": 0.1,
+    "youtubeId": "-xX6aeaoHR0",
+    "title": "Control",
+    "artist": "Aaron Taos",
+    "duration": 184
   }
 ]
