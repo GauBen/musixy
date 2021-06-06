@@ -78,5 +78,21 @@
     "title": "Control",
     "artist": "Aaron Taos",
     "duration": 184
+  },
+  {
+    "x": 0.7,
+    "y": -0.5,
+    "youtubeId": "z8ZqFlw6hYg",
+    "title": "Raining Blood",
+    "artist": "Slayer",
+    "duration": 257
+  },
+  {
+    "x": -0.7,
+    "y": 0.6,
+    "youtubeId": "1EsaGNF2E1g",
+    "title": "J'ai du bon tabac",
+    "artist": "Bonne nuit les petits",
+    "duration": 250
   }
 ]

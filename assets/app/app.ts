@@ -1,13 +1,14 @@
 import {Marker, Point} from './marker'
 
-export type Playlist = Array<{
+export type Song = {
   x: number
   y: number
   youtubeId: string
   title: string
   artist: string
   duration: number
-}>
+}
+export type Playlist = Song[]
 
 export type ContributionData = {
   x: number

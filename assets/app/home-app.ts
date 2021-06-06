@@ -1,6 +1,20 @@
-import {Point, Vector} from './marker'
-import {App, state, Playlist, escapeHtml, listen} from './app'
+import {Vector} from './marker'
+import {App, state, Playlist, escapeHtml, listen, Song} from './app'
 import allSongs from '../playlist.json'
+
+const sof = {
+  x: -0.9,
+  y: -0.9,
+  youtubeId: 'l0q7MLPo-u8',
+  title: 'The Sound of Silence',
+  artist: 'Simon & Garfunkel',
+  duration: 187
+}
+for (let i = 0; i < 1000; i++) {
+  sof.x = Math.random() * 2 - 1
+  sof.y = Math.random() * 2 - 1
+  allSongs.push({...sof})
+}
 
 export class HomeApp extends App {
   $duration: HTMLInputElement
@@ -37,8 +51,10 @@ export class HomeApp extends App {
         y: event.offsetY
       })
       this.init()
-      if (lastPoint.sub(point).len() >= Number.EPSILON)
-        this.marker.drawArrow(lastPoint, point)
+      const length = lastPoint.sub(point).len()
+      if (length >= 0.2) this.marker.drawArrow(lastPoint, point)
+      else if (length >= Number.EPSILON)
+        this.marker.drawCircle(lastPoint, length, '#000')
     }
 
     this.board.addEventListener('mousemove', drawArrow)
@@ -57,11 +73,43 @@ export class HomeApp extends App {
   async fetchPlaylist(from: Vector, to: Vector): state {
     this.init()
     this.marker.drawArrow(from, to)
-    let duration = 60 * Number(this.$duration.value)
-    const playlist = []
-    const projections: Array<[number, Vector, any]> = []
-    const songs: Playlist = allSongs.slice()
+    const duration = 60 * Number(this.$duration.value)
+    const length = to.sub(from).len()
+    const playlist =
+      length >= 0.2
+        ? this.makePathPlaylist(from, to, duration)
+        : this.makeCirclePlaylist(from, to, duration)
 
+    return async () => this.displayPlaylist(from, to, playlist as Playlist)
+  }
+
+  makeCirclePlaylist(from: Vector, to: Vector, duration: number) {
+    const songs: Playlist = allSongs.slice()
+    const distances: Array<[number, any]> = []
+    for (const song of songs) {
+      distances.push([from.sub(song).len2(), song])
+    }
+
+    distances.sort((a, b) => {
+      const [p1] = a
+      const [p2] = b
+      return p2 - p1
+    })
+
+    const playlist = []
+    while (duration > 0) {
+      const [, song] = distances.pop()
+      playlist.push(song)
+      duration -= song.duration
+    }
+
+    return playlist
+  }
+
+  makePathPlaylist(from: Vector, to: Vector, duration: number) {
+    const playlist: Array<Song & {projection: Vector}> = []
+    const songs: Playlist = allSongs.slice()
+    const projections: Array<[number, Vector, Song & {projection: Vector}]> = []
     let startSong = songs[0]
     let startSongDistance = from.sub(startSong).len2()
     let endSong = songs[0]
@@ -70,7 +118,7 @@ export class HomeApp extends App {
     for (const song of songs) {
       const projection = Vector.orthographicProjection(from, to, song)
       const projectionLength2 = projection.sub(new Vector(song)).len2()
-      projections.push([projectionLength2, projection, song])
+      projections.push([projectionLength2, projection, {...song, projection}])
       if (from.sub(song).len2() < startSongDistance) {
         startSong = song
         startSongDistance = from.sub(song).len2()
@@ -114,7 +162,6 @@ export class HomeApp extends App {
         const t = projection.sub(from).dot(to.sub(from)) / to.sub(from).len2()
         if (t <= 0 || t >= 1) continue
         projections.splice(i, 1)
-        song.projection = projection
         playlist.push(song)
         const section1: [number, Vector, Vector] = [
           projection.sub(from).len2(),
@@ -137,13 +184,13 @@ export class HomeApp extends App {
         song1.projection.sub(from).len2() - song2.projection.sub(from).len2()
       )
     })
-    playlist.unshift(startSong)
-    if (startSong !== endSong) playlist.push(endSong)
-
-    return async () => this.displayPlaylist(from, to, playlist as Playlist)
+    playlist.unshift({...startSong, projection: new Vector(0, 0)})
+    if (startSong !== endSong)
+      playlist.push({...endSong, projection: new Vector(0, 0)})
+    return playlist
   }
 
-  async displayPlaylist(from: Point, to: Point, playlist: Playlist): state {
+  async displayPlaylist(from: Vector, to: Vector, playlist: Playlist): state {
     const $playlist = document.querySelector('#playlist')
 
     if (playlist.length === 0) {
@@ -173,7 +220,7 @@ export class HomeApp extends App {
     return async () => this.drawPlaylist(from, to, playlist)
   }
 
-  async drawPlaylist(from: Point, to: Point, playlist: Playlist): state {
+  async drawPlaylist(from: Vector, to: Vector, playlist: Playlist): state {
     return new Promise((resolve) => {
       const vectors = playlist.map((music) => new Vector(music))
 
@@ -204,7 +251,10 @@ export class HomeApp extends App {
         }
 
         this.init()
-        this.marker.drawArrow(from, to)
+        const length = from.sub(to).len()
+        if (length >= 0.2) this.marker.drawArrow(from, to)
+        else if (length >= Number.EPSILON)
+          this.marker.drawCircle(from, length, '#000')
         this.marker.drawPolyLine(chain, '#F00')
         for (const dot of dots) this.marker.drawPoint(dot, 4)
         return time < cumulatedLength

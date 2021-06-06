@@ -190,18 +190,36 @@ export class Marker {
 
   drawPoint(
     point: Point,
-    radius = 10,
+    radiusPx = 10,
     color: string | CanvasGradient | CanvasPattern = null
   ) {
     const ctx = this.context
 
     const center = this.toCanvasVector(point)
     ctx.beginPath()
-    ctx.arc(center.x, center.y, radius * this.pixelRatio, 0, 7, false)
+    ctx.arc(center.x, center.y, radiusPx * this.pixelRatio, 0, 7, false)
     ctx.fillStyle = '#fff'
     ctx.fill()
     ctx.strokeStyle = color
-    ctx.lineWidth = (radius / 2.5) * this.pixelRatio
+    ctx.lineWidth = (radiusPx / 2.5) * this.pixelRatio
+    ctx.stroke()
+  }
+
+  drawCircle(
+    point: Point,
+    radius: number,
+    color: string | CanvasGradient | CanvasPattern = null
+  ) {
+    const ctx = this.context
+    const radiusPx =
+      (radius / (this.toX - this.fromX)) * this.width * this.pixelRatio
+    const center = this.toCanvasVector(point)
+    ctx.beginPath()
+    ctx.arc(center.x, center.y, radiusPx, 0, 7, false)
+    ctx.fillStyle = '#fff'
+    ctx.fill()
+    ctx.strokeStyle = color
+    ctx.lineWidth = 2
     ctx.stroke()
   }
 
