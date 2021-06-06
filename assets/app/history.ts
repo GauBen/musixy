@@ -1,8 +1,7 @@
 import {escapeHtml, Playlist} from './app'
-import playlist from '../playlist.json'
 
 const main = async () => {
-  const response: Playlist[] = [playlist]
+  const response: Playlist[] = [await (await fetch('../songs.json')).json()]
   let html = ''
   for (const playlist of response) {
     if (playlist.length < 2) continue

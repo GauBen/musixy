@@ -1,7 +1,7 @@
 import {Vector} from './marker'
 import {App, state, Playlist, escapeHtml, listen, Song} from './app'
-import allSongs from '../playlist.json'
 
+const allSongs: Song[] = []
 const sof = {
   x: -0.9,
   y: -0.9,
@@ -20,6 +20,7 @@ export class HomeApp extends App {
   $duration: HTMLInputElement
   async run() {
     this.setupSlider()
+    allSongs.push(...((await (await fetch('./songs.json')).json()) as Playlist))
     let state: state = this.initialState()
     while (true) {
       const transition: () => state = await state
