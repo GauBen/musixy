@@ -8,18 +8,24 @@ const musicToVect = (music: Music) =>
 type state = Promise<() => state>
 
 export class HomeApp {
-  protected $duration: HTMLInputElement
-  protected db: DataBase
+  /** Canvas element */
   protected board: HTMLCanvasElement
+
+  /** 2DContext drawer */
   protected marker: Marker
+
+  /** The duration slider */
+  protected $duration: HTMLInputElement
+
+  /** Loaded musics */
+  protected db: DataBase
 
   constructor(board: HTMLCanvasElement) {
     this.board = board
     this.marker = new Marker(board, {
       x: [-1, 1],
       y: [-1, 1],
-      width: 400,
-      height: 400,
+      pixelsPerUnit: 200,
       pixelRatio: window.devicePixelRatio
     })
   }

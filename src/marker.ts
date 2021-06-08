@@ -1,8 +1,7 @@
 export interface MarkerSettings {
   x: [number, number]
   y: [number, number]
-  width: number
-  height: number
+  pixelsPerUnit: number
   pixelRatio: number
 }
 
@@ -91,17 +90,15 @@ export class Marker {
   protected toX: number
   protected toY: number
 
-  protected width: number
-  protected height: number
   protected pixelRatio: number
+  protected pixelsPerUnit: number
 
   constructor(
     canvas: HTMLCanvasElement,
     {
       x: [fromX, toX],
       y: [fromY, toY],
-      width,
-      height,
+      pixelsPerUnit,
       pixelRatio
     }: MarkerSettings
   ) {
@@ -113,30 +110,24 @@ export class Marker {
     this.toX = toX
     this.toY = toY
 
-    this.resize(width, height, pixelRatio)
+    this.resize(pixelsPerUnit, pixelRatio)
     this.clear()
   }
 
-  resize(width: number, height: number, pixelRatio: number) {
-    this.width = width
-    this.height = height
+  resize(pixelsPerUnit: number, pixelRatio: number) {
+    this.pixelsPerUnit = pixelsPerUnit
     this.pixelRatio = pixelRatio
 
-    this.canvas.width = width * pixelRatio
-    this.canvas.height = height * pixelRatio
-    this.canvas.style.width = `${width}px`
-    this.canvas.style.height = `${height}px`
+    this.canvas.width = (this.toX - this.fromX) * pixelsPerUnit * pixelRatio
+    this.canvas.height = (this.toY - this.fromY) * pixelsPerUnit * pixelRatio
+    this.canvas.style.width = `${(this.toX - this.fromX) * pixelsPerUnit}px`
+    this.canvas.style.height = `${(this.toY - this.fromY) * pixelsPerUnit}px`
 
     this.context.lineWidth = 3 * pixelRatio
   }
 
   clear() {
-    this.context.clearRect(
-      0,
-      0,
-      this.width * this.pixelRatio,
-      this.height * this.pixelRatio
-    )
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height)
     this.context.lineJoin = 'round'
     this.context.lineCap = 'round'
     this.context.lineWidth = 2 * this.pixelRatio
@@ -211,8 +202,7 @@ export class Marker {
     color: string | CanvasGradient | CanvasPattern = null
   ) {
     const ctx = this.context
-    const radiusPx =
-      (radius / (this.toX - this.fromX)) * this.width * this.pixelRatio
+    const radiusPx = radius * this.pixelsPerUnit * this.pixelRatio
     const center = this.toCanvasVector(point)
     ctx.beginPath()
     ctx.arc(center.x, center.y, radiusPx, 0, 7, false)
@@ -255,19 +245,15 @@ export class Marker {
 
   toCanvasVector(point: Point): Vector {
     return new Vector(
-      ((point.x - this.fromX) / (this.toX - this.fromX)) *
-        this.width *
-        this.pixelRatio,
-      ((-point.y - this.fromY) / (this.toY - this.fromY)) *
-        this.height *
-        this.pixelRatio
+      (point.x - this.fromX) * this.pixelsPerUnit * this.pixelRatio,
+      (-point.y - this.fromY) * this.pixelsPerUnit * this.pixelRatio
     )
   }
 
   fromCanvasPoint(point: Point): Vector {
     return new Vector(
-      (point.x / this.width) * (this.toX - this.fromX) + this.fromX,
-      (1 - point.y / this.height) * (this.toY - this.fromY) + this.fromY
+      point.x / this.pixelsPerUnit + this.fromX,
+      (this.canvas.height - point.y) / this.pixelsPerUnit + this.fromY
     )
   }
 }
