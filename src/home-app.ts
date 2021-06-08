@@ -1,18 +1,34 @@
-import {Vector} from './marker'
-import {App, state, escapeHtml, listen, JSONDataBase, JSONSong} from './app'
+import {Vector, Marker} from './marker'
+import {escape, listen} from './lib/html'
+import {DataBase, Song, MusicFields} from './db.d'
 
-const songToVect = (song: JSONSong) => new Vector(song[1], song[2])
+const songToVect = (song: Song) =>
+  new Vector(song[MusicFields.X], song[MusicFields.Y])
 
-export class HomeApp extends App {
+export type state = Promise<() => state>
+export class HomeApp {
   $duration: HTMLInputElement
-  db: JSONDataBase
+  db: DataBase
+  protected board: HTMLCanvasElement
+  protected marker: Marker
+
+  constructor(board: HTMLCanvasElement) {
+    this.board = board
+    this.marker = new Marker(board, {
+      x: [-1, 1],
+      y: [-1, 1],
+      width: 400,
+      height: 400,
+      pixelRatio: window.devicePixelRatio
+    })
+  }
 
   async run() {
     this.setupSlider()
 
     this.db = await (await fetch('./songs.json')).json()
     for (let i = 0; i < 1000; i++)
-      this.db.songs.push([
+      this.db.musics.push([
         'l0q7MLPo-u8',
         Math.random() * 2 - 1,
         Math.random() * 2 - 1,
@@ -97,8 +113,8 @@ export class HomeApp extends App {
   }
 
   makeCirclePlaylist(from: Vector, to: Vector, duration: number) {
-    const distances: Array<[number, JSONSong]> = []
-    for (const song of this.db.songs) {
+    const distances: Array<[number, Song]> = []
+    for (const song of this.db.musics) {
       distances.push([from.sub(songToVect(song)).len2(), song])
     }
 
@@ -108,22 +124,22 @@ export class HomeApp extends App {
       return p2 - p1
     })
 
-    const playlist: JSONSong[] = []
+    const playlist: Song[] = []
     while (duration > 0 && distances.length > 0) {
       const [, song] = distances.pop()!
       playlist.push(song)
-      duration -= song[5]
+      duration -= song[MusicFields.Duration]
     }
 
     return playlist
   }
 
   makePathPlaylist(from: Vector, to: Vector, duration: number) {
-    const playlist: Array<[number, JSONSong]> = []
+    const playlist: Array<[number, Song]> = []
 
-    const allSongs = this.db.songs
+    const allSongs = this.db.musics
 
-    const projections: Array<[number, Vector, JSONSong]> = []
+    const projections: Array<[number, Vector, Song]> = []
 
     let startSong = allSongs[0]
     let startSongDistance = from.sub(songToVect(startSong)).len2()
@@ -147,7 +163,10 @@ export class HomeApp extends App {
       }
     }
 
-    duration -= endSong === startSong ? startSong[5] : startSong[5] + endSong[5]
+    duration -=
+      endSong === startSong
+        ? startSong[MusicFields.Duration]
+        : startSong[MusicFields.Duration] + endSong[MusicFields.Duration]
 
     projections.sort((a, b) => {
       const [p1] = a
@@ -184,7 +203,7 @@ export class HomeApp extends App {
         if (t <= 0 || t >= 1) continue
         projections.splice(i, 1)
         playlist.push([projection.sub(from).len2(), song])
-        duration -= song[5]
+        duration -= song[MusicFields.Duration]
         const section1: [number, Vector, Vector] = [
           projection.sub(sectionFrom).len2(),
           sectionFrom,
@@ -215,7 +234,7 @@ export class HomeApp extends App {
     return realPlaylist
   }
 
-  async displayPlaylist(from: Vector, to: Vector, playlist: JSONSong[]): state {
+  async displayPlaylist(from: Vector, to: Vector, playlist: Song[]): state {
     const $playlist = document.querySelector('#playlist')
 
     if (playlist.length === 0) {
@@ -228,24 +247,24 @@ export class HomeApp extends App {
 
     for (const music of playlist) {
       html += `<li class="item playlist-entry">
-          <img class="cover" src="https://i.ytimg.com/vi/${escapeHtml(
+          <img class="cover" src="https://i.ytimg.com/vi/${escape(
             music[0]
           )}/mqdefault.jpg" alt="Thumbnail" width="85.33" height="48">
-          <span class="title">${escapeHtml(music[3])}</span>
-          <span class="artist">${escapeHtml(music[4])}</span>
+          <span class="title">${escape(music[MusicFields.Title])}</span>
+          <span class="artist">${escape(music[MusicFields.Artist])}</span>
         </li>`
     }
 
     html += '</ul></div>'
     html += `<p class="youtube-link"><a href="http://www.youtube.com/watch_videos?video_ids=${encodeURI(
-      playlist.map((music) => music[0]).join(',')
+      playlist.map((music) => music[MusicFields.YoutubeId]).join(',')
     )}" target="_blank" rel="noopener">Listen on YouTube</a></p>`
     $playlist.innerHTML = html
 
     return async () => this.drawPlaylist(from, to, playlist)
   }
 
-  async drawPlaylist(from: Vector, to: Vector, playlist: JSONSong[]): state {
+  async drawPlaylist(from: Vector, to: Vector, playlist: Song[]): state {
     return new Promise((resolve) => {
       const vectors = playlist.map((music) => new Vector(songToVect(music)))
 
