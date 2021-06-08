@@ -1,9 +1,9 @@
-import {DataBase, MusicFields, Song} from './db.d'
+import {DataBase, MusicFields, Music} from './db.d'
 import {escape} from './lib/html'
 
 const main = async () => {
-  const db: DataBase = await (await fetch('../songs.json')).json()
-  const playlists: Song[][] = [[db.musics[0], db.musics[db.musics.length - 1]]]
+  const db: DataBase = await (await fetch('../db.json')).json()
+  const playlists: Music[][] = [[db.musics[0], db.musics[db.musics.length - 1]]]
   let html = ''
   for (const playlist of playlists) {
     if (playlist.length < 2) continue

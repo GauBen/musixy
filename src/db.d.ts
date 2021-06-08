@@ -1,7 +1,7 @@
-export type Song = [string, number, number, string, string, number]
+export type Music = [string, number, number, string, string, number]
 export type DataBase = {
   axes: [string, string, string, string]
-  musics: Song[]
+  musics: Music[]
 }
 
 export enum MusicFields {

@@ -1,14 +1,15 @@
 import {Vector, Marker} from './marker'
 import {escape, listen} from './lib/html'
-import {DataBase, Song, MusicFields} from './db.d'
+import {DataBase, Music, MusicFields} from './db.d'
 
-const songToVect = (song: Song) =>
-  new Vector(song[MusicFields.X], song[MusicFields.Y])
+const musicToVect = (music: Music) =>
+  new Vector(music[MusicFields.X], music[MusicFields.Y])
 
-export type state = Promise<() => state>
+type state = Promise<() => state>
+
 export class HomeApp {
-  $duration: HTMLInputElement
-  db: DataBase
+  protected $duration: HTMLInputElement
+  protected db: DataBase
   protected board: HTMLCanvasElement
   protected marker: Marker
 
@@ -26,7 +27,8 @@ export class HomeApp {
   async run() {
     this.setupSlider()
 
-    this.db = await (await fetch('./songs.json')).json()
+    this.db = await (await fetch('./db.json')).json()
+
     for (let i = 0; i < 1000; i++)
       this.db.musics.push([
         'l0q7MLPo-u8',
@@ -113,9 +115,9 @@ export class HomeApp {
   }
 
   makeCirclePlaylist(from: Vector, to: Vector, duration: number) {
-    const distances: Array<[number, Song]> = []
-    for (const song of this.db.musics) {
-      distances.push([from.sub(songToVect(song)).len2(), song])
+    const distances: Array<[number, Music]> = []
+    for (const music of this.db.musics) {
+      distances.push([from.sub(musicToVect(music)).len2(), music])
     }
 
     distances.sort((a, b) => {
@@ -124,49 +126,47 @@ export class HomeApp {
       return p2 - p1
     })
 
-    const playlist: Song[] = []
+    const playlist: Music[] = []
     while (duration > 0 && distances.length > 0) {
-      const [, song] = distances.pop()!
-      playlist.push(song)
-      duration -= song[MusicFields.Duration]
+      const [, music] = distances.pop()!
+      playlist.push(music)
+      duration -= music[MusicFields.Duration]
     }
 
     return playlist
   }
 
   makePathPlaylist(from: Vector, to: Vector, duration: number) {
-    const playlist: Array<[number, Song]> = []
+    const playlist: Array<[number, Music]> = []
 
-    const allSongs = this.db.musics
+    const projections: Array<[number, Vector, Music]> = []
 
-    const projections: Array<[number, Vector, Song]> = []
+    let firstMusic = this.db.musics[0]
+    let firstMusicDistance = from.sub(musicToVect(firstMusic)).len2()
+    let lastMusic = this.db.musics[0]
+    let lastMusicDistance = to.sub(musicToVect(lastMusic)).len2()
 
-    let startSong = allSongs[0]
-    let startSongDistance = from.sub(songToVect(startSong)).len2()
-    let endSong = allSongs[0]
-    let endSongDistance = to.sub(songToVect(endSong)).len2()
-
-    for (const song of allSongs) {
-      const v = songToVect(song)
+    for (const music of this.db.musics) {
+      const v = musicToVect(music)
       const projection = Vector.orthographicProjection(from, to, v)
       const projectionLength2 = projection.sub(v).len2()
-      projections.push([projectionLength2, projection, song])
+      projections.push([projectionLength2, projection, music])
 
-      if (from.sub(v).len2() < startSongDistance) {
-        startSong = song
-        startSongDistance = from.sub(v).len2()
+      if (from.sub(v).len2() < firstMusicDistance) {
+        firstMusic = music
+        firstMusicDistance = from.sub(v).len2()
       }
 
-      if (to.sub(v).len2() < endSongDistance) {
-        endSong = song
-        endSongDistance = to.sub(v).len2()
+      if (to.sub(v).len2() < lastMusicDistance) {
+        lastMusic = music
+        lastMusicDistance = to.sub(v).len2()
       }
     }
 
     duration -=
-      endSong === startSong
-        ? startSong[MusicFields.Duration]
-        : startSong[MusicFields.Duration] + endSong[MusicFields.Duration]
+      lastMusic === firstMusic
+        ? firstMusic[MusicFields.Duration]
+        : firstMusic[MusicFields.Duration] + lastMusic[MusicFields.Duration]
 
     projections.sort((a, b) => {
       const [p1] = a
@@ -195,15 +195,15 @@ export class HomeApp {
       const sectionFrom = maxSection[1]
       const sectionTo = maxSection[2]
 
-      for (const [i, [, projection, song]] of projections.entries()) {
-        if (song === startSong || song === endSong) continue
+      for (const [i, [, projection, music]] of projections.entries()) {
+        if (music === firstMusic || music === lastMusic) continue
         const t =
           projection.sub(sectionFrom).dot(sectionTo.sub(sectionFrom)) /
           sectionTo.sub(sectionFrom).len2()
         if (t <= 0 || t >= 1) continue
         projections.splice(i, 1)
-        playlist.push([projection.sub(from).len2(), song])
-        duration -= song[MusicFields.Duration]
+        playlist.push([projection.sub(from).len2(), music])
+        duration -= music[MusicFields.Duration]
         const section1: [number, Vector, Vector] = [
           projection.sub(sectionFrom).len2(),
           sectionFrom,
@@ -229,12 +229,12 @@ export class HomeApp {
       return y
     })
 
-    realPlaylist.unshift(startSong)
-    if (startSong !== endSong) realPlaylist.push(endSong)
+    realPlaylist.unshift(firstMusic)
+    if (firstMusic !== lastMusic) realPlaylist.push(lastMusic)
     return realPlaylist
   }
 
-  async displayPlaylist(from: Vector, to: Vector, playlist: Song[]): state {
+  async displayPlaylist(from: Vector, to: Vector, playlist: Music[]): state {
     const $playlist = document.querySelector('#playlist')
 
     if (playlist.length === 0) {
@@ -264,9 +264,9 @@ export class HomeApp {
     return async () => this.drawPlaylist(from, to, playlist)
   }
 
-  async drawPlaylist(from: Vector, to: Vector, playlist: Song[]): state {
+  async drawPlaylist(from: Vector, to: Vector, playlist: Music[]): state {
     return new Promise((resolve) => {
-      const vectors = playlist.map((music) => new Vector(songToVect(music)))
+      const vectors = playlist.map((music) => musicToVect(music))
 
       const draw = (time: number) => {
         const chain: Vector[] = []
