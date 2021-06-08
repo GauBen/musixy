@@ -1,27 +1,9 @@
-import {Marker, Point} from './marker'
+import {Marker} from './marker'
 
-export type Song = {
-  x: number
-  y: number
-  youtubeId: string
-  title: string
-  artist: string
-  duration: number
-}
-export type Playlist = Song[]
-
-export type ContributionData = {
-  x: number
-  y: number
-  youtubeId: string
-  token?: string
-}
-
-export type MakePlaylistData = {
-  from: Point
-  to: Point
-  duration: number
-  token?: string
+export type JSONSong = [string, number, number, string, string, number]
+export type JSONDataBase = {
+  axes: [string, string, string, string]
+  songs: JSONSong[]
 }
 
 export type state = Promise<() => state>
@@ -60,7 +42,6 @@ export abstract class App {
       height: 400,
       pixelRatio: window.devicePixelRatio
     })
-    this.init()
   }
 
   init() {
