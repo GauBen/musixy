@@ -1,15 +1,17 @@
 import {Vector, Marker} from './marker'
 import {escape, listen} from './lib/html'
-import {DataBase, Music, MusicFields} from './db.d'
+import {Database, Music, MusicFields} from './db.d'
 
 const musicToVect = (music: Music) =>
   new Vector(music[MusicFields.X], music[MusicFields.Y])
 
 type state = Promise<() => state>
 
+const CIRCLE_TRESHOLD = 0.2
+
 export class HomeApp {
   /** Canvas element */
-  protected board: HTMLCanvasElement
+  protected $board: HTMLCanvasElement
 
   /** 2DContext drawer */
   protected marker: Marker
@@ -17,26 +19,52 @@ export class HomeApp {
   /** The duration slider */
   protected $duration: HTMLInputElement
 
-  /** Loaded musics */
-  protected db: DataBase
+  /** The tooltip associated with the slider */
+  protected $tooltip: HTMLElement
 
-  constructor(board: HTMLCanvasElement) {
-    this.board = board
+  /** Loaded musics */
+  protected database: Database
+
+  constructor({
+    board,
+    duration,
+    tooltip
+  }: {
+    board: HTMLCanvasElement
+    duration: HTMLInputElement
+    tooltip: HTMLElement
+  }) {
+    this.$board = board
+    this.$duration = duration
+    this.$tooltip = tooltip
+
     this.marker = new Marker(board, {
       x: [-1, 1],
       y: [-1, 1],
       pixelsPerUnit: 200,
       pixelRatio: window.devicePixelRatio
     })
+
+    this.$tooltip.innerHTML = `${this.$duration.value} min`
+    this.$duration.addEventListener('input', () => {
+      this.$tooltip.innerHTML = `${this.$duration.value} min`
+    })
   }
 
+  /** Start the finite-state automaton */
   async run() {
-    this.setupSlider()
+    let state: state = this.loadDatabase()
+    while (true) {
+      const transition: () => state = await state
+      state = transition()
+    }
+  }
 
-    this.db = await (await fetch('./db.json')).json()
-
+  /** Fetch the music database */
+  async loadDatabase() {
+    this.database = await (await fetch('./db.json')).json()
     for (let i = 0; i < 1000; i++)
-      this.db.musics.push([
+      this.database.musics.push([
         'l0q7MLPo-u8',
         Math.random() * 2 - 1,
         Math.random() * 2 - 1,
@@ -44,86 +72,69 @@ export class HomeApp {
         'Simon & Garfunkel',
         187
       ])
-
-    this.init()
-
-    let state: state = this.initialState()
-    while (true) {
-      const transition: () => state = await state
-      state = transition()
-    }
+    this.drawAxes()
+    return async () => this.waitForFirstInput()
   }
 
-  setupSlider() {
-    this.$duration = document.querySelector('#duration')
-    const $tooltip = document.querySelector('#duration-tooltip')
-    $tooltip.innerHTML = `${this.$duration.value} min`
-    this.$duration.addEventListener('input', () => {
-      $tooltip.innerHTML = `${this.$duration.value} min`
-    })
-  }
-
-  init() {
-    this.marker.clear()
-    this.marker.drawArrow({x: -0.98, y: 0}, {x: 0.98, y: 0})
-    this.marker.drawArrow({x: 0, y: -0.98}, {x: 0, y: 0.98})
-    this.marker.drawText(this.db.axes[0], {x: -0.03, y: -1}, 'NW')
-    this.marker.drawText(this.db.axes[1], {x: -0.08, y: 1}, 'SW')
-    this.marker.drawText(this.db.axes[2], {x: -1, y: 0}, 'SE')
-    this.marker.drawText(this.db.axes[3], {x: 0.9, y: 0}, 'SW')
-  }
-
-  async initialState(): state {
-    const event = await listen(this.board, 'click')
+  /** Wait for a click, a touch start or a drag start */
+  async waitForFirstInput(): state {
+    const event = await listen(this.$board, 'click')
     const point: Vector = this.marker.fromCanvasPoint({
       x: event.offsetX,
       y: event.offsetY
     })
-    return async () => this.state2(point)
+    return async () => this.waitForSecondClick(point)
   }
 
-  async state2(lastPoint: Vector): state {
-    const drawArrow = (event: MouseEvent) => {
+  /** Wait for the second click */
+  async waitForSecondClick(lastPoint: Vector): state {
+    const drawPreview = (event: MouseEvent) => {
       const point: Vector = this.marker.fromCanvasPoint({
         x: event.offsetX,
         y: event.offsetY
       })
-      this.init()
-      const length = lastPoint.sub(point).len()
-      if (length >= 0.2) this.marker.drawArrow(lastPoint, point)
-      else if (length >= Number.EPSILON)
-        this.marker.drawCircle(lastPoint, length, '#000')
+      this.drawAxes()
+      this.drawPathPreview(lastPoint, point)
     }
 
-    this.board.addEventListener('mousemove', drawArrow)
+    this.$board.addEventListener('mousemove', drawPreview)
 
-    const event = await listen(this.board, 'click')
+    // Wait for second click
+    const event = await listen(this.$board, 'click')
+
     const point: Vector = this.marker.fromCanvasPoint({
       x: event.offsetX,
       y: event.offsetY
     })
-    this.board.removeEventListener('mousemove', drawArrow)
+
+    this.$board.removeEventListener('mousemove', drawPreview)
+
+    // Protect against double clicks
     if (lastPoint.sub(point).len() <= Number.EPSILON)
-      return async () => this.state2(point)
-    return async () => this.fetchPlaylist(lastPoint, point)
+      return async () => this.waitForSecondClick(point)
+
+    return async () => this.makePlaylist(lastPoint, point)
   }
 
-  async fetchPlaylist(from: Vector, to: Vector): state {
-    this.init()
-    this.marker.drawArrow(from, to)
+  /** Make a playlist based on the two points given */
+  async makePlaylist(from: Vector, to: Vector): state {
+    this.drawAxes()
+    this.drawPathPreview(from, to)
+
     const duration = 60 * Number(this.$duration.value)
     const length = to.sub(from).len()
     const playlist =
-      length >= 0.2
-        ? this.makePathPlaylist(from, to, duration)
+      length >= CIRCLE_TRESHOLD
+        ? this.makeArrowPlaylist(from, to, duration)
         : this.makeCirclePlaylist(from, to, duration)
 
     return async () => this.displayPlaylist(from, to, playlist)
   }
 
+  /** If the two points are close, make a circular playlist */
   makeCirclePlaylist(from: Vector, to: Vector, duration: number) {
     const distances: Array<[number, Music]> = []
-    for (const music of this.db.musics) {
+    for (const music of this.database.musics) {
       distances.push([from.sub(musicToVect(music)).len2(), music])
     }
 
@@ -143,21 +154,22 @@ export class HomeApp {
     return playlist
   }
 
-  makePathPlaylist(from: Vector, to: Vector, duration: number) {
+  /** If the two points are far, make a linear playlist */
+  makeArrowPlaylist(from: Vector, to: Vector, duration: number) {
     const playlist: Array<[number, Music]> = []
 
     const projections: Array<[number, Vector, Music]> = []
 
-    let firstMusic = this.db.musics[0]
+    let firstMusic = this.database.musics[0]
     let firstMusicDistance = from.sub(musicToVect(firstMusic)).len2()
-    let lastMusic = this.db.musics[0]
+    let lastMusic = this.database.musics[0]
     let lastMusicDistance = to.sub(musicToVect(lastMusic)).len2()
 
-    for (const music of this.db.musics) {
+    for (const music of this.database.musics) {
       const v = musicToVect(music)
       const projection = Vector.orthographicProjection(from, to, v)
-      const projectionLength2 = projection.sub(v).len2()
-      projections.push([projectionLength2, projection, music])
+      const projectionLength = projection.sub(v).len2()
+      projections.push([projectionLength, projection, music])
 
       if (from.sub(v).len2() < firstMusicDistance) {
         firstMusic = music
@@ -247,7 +259,7 @@ export class HomeApp {
     if (playlist.length === 0) {
       $playlist.innerHTML =
         '<p class="user-instruction"><strong>Error:</strong> the server created an empty playlist. Please retry later.</p>'
-      return async () => this.initialState()
+      return async () => this.waitForFirstInput()
     }
 
     let html = '<div class="wrapper"><ul class="music-list">'
@@ -301,11 +313,8 @@ export class HomeApp {
           previous = vector
         }
 
-        this.init()
-        const length = from.sub(to).len()
-        if (length >= 0.2) this.marker.drawArrow(from, to)
-        else if (length >= Number.EPSILON)
-          this.marker.drawCircle(from, length, '#000')
+        this.drawAxes()
+        this.drawPathPreview(from, to)
         this.marker.drawPolyLine(chain, '#F00')
         for (const dot of dots) this.marker.drawPoint(dot, 4)
         return time < cumulatedLength
@@ -317,14 +326,37 @@ export class HomeApp {
         if (draw((t - start) * 0.001)) {
           requestAnimationFrame(frame)
         } else {
-          resolve(async () => this.initialState())
+          resolve(async () => this.waitForFirstInput())
         }
       }
 
       requestAnimationFrame(frame)
     })
   }
+
+  /** Draw the two axes */
+  drawAxes() {
+    this.marker.clear()
+    this.marker.drawArrow({x: -0.98, y: 0}, {x: 0.98, y: 0})
+    this.marker.drawArrow({x: 0, y: -0.98}, {x: 0, y: 0.98})
+    this.marker.drawText(this.database.axes[0], {x: -0.03, y: -1}, 'NW')
+    this.marker.drawText(this.database.axes[1], {x: -0.08, y: 1}, 'SW')
+    this.marker.drawText(this.database.axes[2], {x: -1, y: 0}, 'SE')
+    this.marker.drawText(this.database.axes[3], {x: 0.9, y: 0}, 'SW')
+  }
+
+  /** Draw a circle or an arrow whether to two points are close */
+  drawPathPreview(from: Vector, to: Vector) {
+    const length = to.sub(from).len()
+    if (length >= CIRCLE_TRESHOLD) this.marker.drawArrow(from, to)
+    else if (length >= Number.EPSILON)
+      this.marker.drawCircle(from, length, '#000')
+  }
 }
 
-const app = new HomeApp(document.querySelector('#board'))
+const app = new HomeApp({
+  board: document.querySelector('#board'),
+  duration: document.querySelector('#duration'),
+  tooltip: document.querySelector('#duration-tooltip')
+})
 void app.run()
