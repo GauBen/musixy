@@ -51,6 +51,7 @@ export class HomeApp {
   setupSlider() {
     this.$duration = document.querySelector('#duration')
     const $tooltip = document.querySelector('#duration-tooltip')
+    $tooltip.innerHTML = `${this.$duration.value} min`
     this.$duration.addEventListener('input', () => {
       $tooltip.innerHTML = `${this.$duration.value} min`
     })
