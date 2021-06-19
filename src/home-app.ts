@@ -22,11 +22,17 @@ export class HomeApp {
   /** The tooltip associated with the slider */
   protected $tooltip: HTMLElement
 
-  /** Loaded musics */
-  protected database: Database
+  /** Axes */
+  protected axes: Database['axes']
 
-  /** Selected database file */
-  protected databaseFile = './db.json'
+  /** Loaded musics */
+  protected musics: Database['musics'] = []
+
+  /** Downloaded database files */
+  protected databases: Map<string, Database> = new Map()
+
+  /** Loaded databases */
+  protected loadedDatabases: Set<string> = new Set()
 
   /** Current state of the automaton */
   protected state: (...args: any) => state
@@ -69,21 +75,39 @@ export class HomeApp {
   /** Fetch the music database */
   async loadDatabase(): state {
     this.state = this.loadDatabase
-    this.database = await (await fetch(this.databaseFile)).json()
-    for (let i = 0; i < 1000; i++)
-      this.database.musics.push([
-        'l0q7MLPo-u8',
-        Math.random() * 2 - 1,
-        Math.random() * 2 - 1,
-        'The Sound of Silence',
-        'Simon & Garfunkel',
-        187
-      ])
-    this.drawAxes()
+
+    const database: Database = await (await fetch('./db.json')).json()
+
+    if (
+      typeof database !== 'object' ||
+      !('musixy' in database) ||
+      database.musixy !== 1
+    )
+      throw new Error('Wrong format')
+
+    this.databases.set('db.json', database)
+    this.loadedDatabases = new Set(['db.json'])
+
+    return async () => this.loadMusics()
+  }
+
+  loadMusics(): () => state {
+    if (this.loadedDatabases.size === 0)
+      throw new Error('Load at least 1 database')
+
+    this.axes = this.databases.get(
+      this.loadedDatabases.values().next().value as string
+    ).axes
+
+    this.musics = []
+    for (const database of this.loadedDatabases)
+      this.musics.push(...this.databases.get(database).musics)
+
     return async () => this.resetApp()
   }
 
   resetApp(): () => state {
+    this.drawAxes()
     const $playlist = document.querySelector('#playlist')
     $playlist.innerHTML =
       '<p class="user-instruction">Click twice on the whiteboard to create a playlist</p>'
@@ -145,9 +169,11 @@ export class HomeApp {
   }
 
   async awaitReloadEvent(): Promise<() => state> {
-    const $select: HTMLSelectElement = document.querySelector('#database')
-    await listen($select, 'input')
-    this.databaseFile = $select.value
+    // Const $select: HTMLSelectElement = document.querySelector('#database')
+    await new Promise(() => {
+      void 0
+    })
+    // This.databaseFile = $select.value
     return async () => this.loadDatabase()
   }
 
@@ -169,7 +195,7 @@ export class HomeApp {
   /** If the two points are close, make a circular playlist */
   makeCirclePlaylist(from: Vector, to: Vector, duration: number) {
     const distances: Array<[number, Music]> = []
-    for (const music of this.database.musics) {
+    for (const music of this.musics) {
       distances.push([from.sub(musicToVect(music)).len2(), music])
     }
 
@@ -195,12 +221,12 @@ export class HomeApp {
 
     const projections: Array<[number, Vector, Music]> = []
 
-    let firstMusic = this.database.musics[0]
+    let firstMusic = this.musics[0]
     let firstMusicDistance = from.sub(musicToVect(firstMusic)).len2()
-    let lastMusic = this.database.musics[0]
+    let lastMusic = this.musics[0]
     let lastMusicDistance = to.sub(musicToVect(lastMusic)).len2()
 
-    for (const music of this.database.musics) {
+    for (const music of this.musics) {
       const v = musicToVect(music)
       const projection = Vector.orthographicProjection(from, to, v)
       const projectionLength = projection.sub(v).len2()
@@ -380,10 +406,10 @@ export class HomeApp {
     this.marker.clear()
     this.marker.drawArrow({x: -0.98, y: 0}, {x: 0.98, y: 0})
     this.marker.drawArrow({x: 0, y: -0.98}, {x: 0, y: 0.98})
-    this.marker.drawText(this.database.axes[0], {x: -0.03, y: -1}, 'NW')
-    this.marker.drawText(this.database.axes[1], {x: -0.08, y: 1}, 'SW')
-    this.marker.drawText(this.database.axes[2], {x: -1, y: 0}, 'SE')
-    this.marker.drawText(this.database.axes[3], {x: 0.9, y: 0}, 'SW')
+    this.marker.drawText(this.axes[0], {x: -0.03, y: -1}, 'NW')
+    this.marker.drawText(this.axes[1], {x: -0.08, y: 1}, 'SW')
+    this.marker.drawText(this.axes[2], {x: -1, y: 0}, 'SE')
+    this.marker.drawText(this.axes[3], {x: 0.9, y: 0}, 'SW')
   }
 
   /** Draw a circle or an arrow whether to two points are close */
