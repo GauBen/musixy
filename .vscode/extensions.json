@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "samverschueren.linter-xo",
+    "ronnidc.nunjucks",
+    "editorconfig.editorconfig",
+    "thisismanta.stylus-supremacy",
+    "sysoev.language-stylus",
+    "okitavera.vscode-nunjucks-formatter"
+  ]
+}

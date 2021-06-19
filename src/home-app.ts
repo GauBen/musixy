@@ -146,8 +146,8 @@ export class HomeApp {
 
     const playlist: Music[] = []
     while (duration > 0 && distances.length > 0) {
-      const [, music] = distances.pop()!
-      playlist.push(music)
+      const [, music] = distances.pop()
+      playlist.push(music as Music)
       duration -= music[MusicFields.Duration]
     }
 
