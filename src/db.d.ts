@@ -1,5 +1,6 @@
 export type Music = [string, number, number, string, string, number]
 export type Database = {
+  musixy: 1
   axes: [string, string, string, string]
   musics: Music[]
 }
