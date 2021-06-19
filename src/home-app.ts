@@ -25,6 +25,12 @@ export class HomeApp {
   /** Loaded musics */
   protected database: Database
 
+  /** Selected database file */
+  protected databaseFile = './db.json'
+
+  /** Current state of the automaton */
+  protected state: (...args: any) => state
+
   constructor({
     board,
     duration,
@@ -52,7 +58,7 @@ export class HomeApp {
   }
 
   /** Start the finite-state automaton */
-  async run() {
+  async run(): Promise<never> {
     let state: state = this.loadDatabase()
     while (true) {
       const transition: () => state = await state
@@ -61,8 +67,9 @@ export class HomeApp {
   }
 
   /** Fetch the music database */
-  async loadDatabase() {
-    this.database = await (await fetch('./db.json')).json()
+  async loadDatabase(): state {
+    this.state = this.loadDatabase
+    this.database = await (await fetch(this.databaseFile)).json()
     for (let i = 0; i < 1000; i++)
       this.database.musics.push([
         'l0q7MLPo-u8',
@@ -73,17 +80,30 @@ export class HomeApp {
         187
       ])
     this.drawAxes()
+    return async () => this.resetApp()
+  }
+
+  resetApp(): () => state {
+    const $playlist = document.querySelector('#playlist')
+    $playlist.innerHTML =
+      '<p class="user-instruction">Click twice on the whiteboard to create a playlist</p>'
     return async () => this.waitForFirstInput()
   }
 
   /** Wait for a click, a touch start or a drag start */
   async waitForFirstInput(): state {
-    const event = await listen(this.$board, 'click')
-    const point: Vector = this.marker.fromCanvasPoint({
-      x: event.offsetX,
-      y: event.offsetY
-    })
-    return async () => this.waitForSecondClick(point)
+    this.state = this.waitForFirstInput
+    return Promise.race([
+      (async () => {
+        const event = await listen(this.$board, 'click')
+        const point: Vector = this.marker.fromCanvasPoint({
+          x: event.offsetX,
+          y: event.offsetY
+        })
+        return async () => this.waitForSecondClick(point)
+      })(),
+      this.awaitReloadEvent()
+    ])
   }
 
   /** Wait for the second click */
@@ -99,25 +119,40 @@ export class HomeApp {
 
     this.$board.addEventListener('mousemove', drawPreview)
 
-    // Wait for second click
-    const event = await listen(this.$board, 'click')
+    const transition = await Promise.race([
+      (async () => {
+        // Wait for second click
+        const event = await listen(this.$board, 'click')
 
-    const point: Vector = this.marker.fromCanvasPoint({
-      x: event.offsetX,
-      y: event.offsetY
-    })
+        const point: Vector = this.marker.fromCanvasPoint({
+          x: event.offsetX,
+          y: event.offsetY
+        })
+
+        // Protect against double clicks
+        if (lastPoint.sub(point).len() <= Number.EPSILON)
+          return async () => this.waitForSecondClick(point)
+
+        return async () => this.makePlaylist(lastPoint, point)
+      })(),
+
+      this.awaitReloadEvent()
+    ])
 
     this.$board.removeEventListener('mousemove', drawPreview)
 
-    // Protect against double clicks
-    if (lastPoint.sub(point).len() <= Number.EPSILON)
-      return async () => this.waitForSecondClick(point)
+    return transition
+  }
 
-    return async () => this.makePlaylist(lastPoint, point)
+  async awaitReloadEvent(): Promise<() => state> {
+    const $select: HTMLSelectElement = document.querySelector('#database')
+    await listen($select, 'input')
+    this.databaseFile = $select.value
+    return async () => this.loadDatabase()
   }
 
   /** Make a playlist based on the two points given */
-  async makePlaylist(from: Vector, to: Vector): state {
+  makePlaylist(from: Vector, to: Vector): () => state {
     this.drawAxes()
     this.drawPathPreview(from, to)
 
@@ -253,7 +288,7 @@ export class HomeApp {
     return realPlaylist
   }
 
-  async displayPlaylist(from: Vector, to: Vector, playlist: Music[]): state {
+  displayPlaylist(from: Vector, to: Vector, playlist: Music[]): () => state {
     const $playlist = document.querySelector('#playlist')
 
     if (playlist.length === 0) {
@@ -284,54 +319,60 @@ export class HomeApp {
   }
 
   async drawPlaylist(from: Vector, to: Vector, playlist: Music[]): state {
-    return new Promise((resolve) => {
-      const vectors = playlist.map((music) => musicToVect(music))
+    this.state = this.drawPlaylist
 
-      const draw = (time: number) => {
-        const chain: Vector[] = []
-        let cumulatedLength = 0
-        let previous = vectors[0]
-        const dots = [previous]
-        chain.push(previous)
+    return Promise.race([
+      new Promise<() => state>((resolve) => {
+        const vectors = playlist.map((music) => musicToVect(music))
 
-        for (const vector of vectors.slice(1)) {
-          const delta = vector.sub(previous)
-          const length = delta.len()
-          cumulatedLength += length
+        const draw = (time: number) => {
+          const chain: Vector[] = []
+          let cumulatedLength = 0
+          let previous = vectors[0]
+          const dots = [previous]
+          chain.push(previous)
 
-          if (time < cumulatedLength) {
-            chain.push(
-              previous.add(
-                delta.scale((time + length - cumulatedLength) / length)
+          for (const vector of vectors.slice(1)) {
+            const delta = vector.sub(previous)
+            const length = delta.len()
+            cumulatedLength += length
+
+            if (time < cumulatedLength) {
+              chain.push(
+                previous.add(
+                  delta.scale((time + length - cumulatedLength) / length)
+                )
               )
-            )
-            break
+              break
+            }
+
+            dots.push(vector)
+            chain.push(vector)
+            previous = vector
           }
 
-          dots.push(vector)
-          chain.push(vector)
-          previous = vector
+          this.drawAxes()
+          this.drawPathPreview(from, to)
+          this.marker.drawPolyLine(chain, '#F00')
+          for (const dot of dots) this.marker.drawPoint(dot, 4)
+          return time < cumulatedLength
         }
 
-        this.drawAxes()
-        this.drawPathPreview(from, to)
-        this.marker.drawPolyLine(chain, '#F00')
-        for (const dot of dots) this.marker.drawPoint(dot, 4)
-        return time < cumulatedLength
-      }
-
-      let start = null
-      const frame = (t: number) => {
-        if (start === null) start = t
-        if (draw((t - start) * 0.001)) {
-          requestAnimationFrame(frame)
-        } else {
-          resolve(async () => this.waitForFirstInput())
+        let start: number | null = null
+        const frame = (t: number) => {
+          if (this.state !== this.drawPlaylist) return
+          if (start === null) start = t
+          if (draw((t - start) * 0.001)) {
+            requestAnimationFrame(frame)
+          } else {
+            resolve(async () => this.waitForFirstInput())
+          }
         }
-      }
 
-      requestAnimationFrame(frame)
-    })
+        requestAnimationFrame(frame)
+      }),
+      this.awaitReloadEvent()
+    ])
   }
 
   /** Draw the two axes */

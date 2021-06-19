@@ -25,4 +25,10 @@ layout: html.njk
 <p class="_center">
   <a href="{{ '/history/' | url }}">History</a>
 </p>
+<p>
+  <select id="database">
+    <option value="./db.json">db.json</option>
+    <option value="./db2.json">db2.json</option>
+  </select>
+</p>
 <script src="~/src/home-app.ts"></script>
