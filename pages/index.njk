@@ -29,8 +29,10 @@ layout: html.njk
   <summary>Settings</summary>
   <div id="database-picker"></div>
   <hr>
-  <p>Load a new database: <input type="text">
-    <button>Load</button>
-  </p>
+  <form id="load-database">
+    <p>Load a new database: <input type="url" size="40" id="database-url">
+      <button>Load</button>
+    </p>
+  </form>
 </details>
 <script src="~/src/home-app.ts"></script>

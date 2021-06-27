@@ -52,12 +52,16 @@ export class HomeApp {
     board,
     duration,
     tooltip,
-    databasePicker
+    databasePicker,
+    loadDatabase,
+    databaseUrl
   }: {
     board: HTMLCanvasElement
     duration: HTMLInputElement
     tooltip: HTMLElement
     databasePicker: HTMLElement
+    loadDatabase: HTMLFormElement
+    databaseUrl: HTMLInputElement
   }) {
     this.$board = board
     this.$duration = duration
@@ -75,6 +79,25 @@ export class HomeApp {
     this.$duration.addEventListener('input', () => {
       this.$tooltip.innerHTML = `${this.$duration.value} min`
     })
+
+    loadDatabase.addEventListener('submit', async (event) => {
+      event.preventDefault()
+      await this.addDatabase(databaseUrl.value)
+      this.eventTarget.dispatchEvent(new CustomEvent('reloadDatabase'))
+    })
+  }
+
+  async addDatabase(url: string): Promise<void> {
+    const database: Database = await (await fetch(url)).json()
+
+    if (
+      typeof database !== 'object' ||
+      !('musixy' in database) ||
+      database.musixy !== 1
+    )
+      throw new Error('Wrong format')
+
+    this.databases.set(url, database)
   }
 
   /** Start the finite-state automaton */
@@ -256,7 +279,7 @@ export class HomeApp {
     await new Promise((resolve) => {
       this.eventTarget.addEventListener('reloadDatabase', resolve, {once: true})
     })
-    // This.databaseFile = $select.value
+    this.hydrateDatabasePicker()
     return async () => this.loadMusics()
   }
 
@@ -518,6 +541,8 @@ const app = new HomeApp({
   board: document.querySelector('#board'),
   duration: document.querySelector('#duration'),
   tooltip: document.querySelector('#duration-tooltip'),
-  databasePicker: document.querySelector('#database-picker')
+  databasePicker: document.querySelector('#database-picker'),
+  loadDatabase: document.querySelector('#load-database'),
+  databaseUrl: document.querySelector('#database-url')
 })
 void app.run()
