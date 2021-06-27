@@ -189,6 +189,16 @@ export class HomeApp {
         ? this.makeArrowPlaylist(from, to, duration)
         : this.makeCirclePlaylist(from, to, duration)
 
+    localStorage.setItem(
+      'musixy-history',
+      JSON.stringify([
+        playlist,
+        ...(JSON.parse(
+          localStorage.getItem('musixy-history') ?? '[]'
+        ) as Music[][]).slice(0, 9)
+      ])
+    )
+
     return async () => this.displayPlaylist(from, to, playlist)
   }
 

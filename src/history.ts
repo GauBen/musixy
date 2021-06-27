@@ -1,9 +1,10 @@
-import {DataBase, MusicFields, Music} from './db.d'
+import {MusicFields, Music} from './db.d'
 import {escape} from './lib/html'
 
 const main = async () => {
-  const db: DataBase = await (await fetch('../db.json')).json()
-  const playlists: Music[][] = [[db.musics[0], db.musics[db.musics.length - 1]]]
+  const playlists: Music[][] = JSON.parse(
+    localStorage.getItem('musixy-history') ?? '[]'
+  )
   let html = ''
   for (const playlist of playlists) {
     if (playlist.length < 2) continue
@@ -33,6 +34,10 @@ const main = async () => {
       )}" target="_blank" rel="noopener">Listen on YouTube</a>
       </p>
     </div>`
+  }
+
+  if (playlists.length === 0) {
+    html = '<p><strong>History empty</strong></p>'
   }
 
   document.querySelector('#playlist-history').innerHTML = html
