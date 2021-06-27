@@ -1,6 +1,8 @@
-import {Vector, Marker} from './marker'
-import {escape, listen} from './lib/html'
 import {Database, Music, MusicFields} from './db.d'
+import {escape, listen} from './lib/html'
+import {Marker, Vector} from './marker'
+
+const defaultDatabases = ['./db.json', './db2.json']
 
 const musicToVect = (music: Music) =>
   new Vector(music[MusicFields.X], music[MusicFields.Y])
@@ -32,23 +34,35 @@ export class HomeApp {
   protected databases: Map<string, Database> = new Map()
 
   /** Loaded databases */
-  protected loadedDatabases: Set<string> = new Set()
+  protected loadedDatabases: Set<string>
+
+  /** Databases checked in settings panel */
+  protected checkedDatabases: Map<string, Set<string>> = new Map()
 
   /** Current state of the automaton */
   protected state: (...args: any) => state
 
+  /** Interface to choose loaded databases */
+  protected $databasePicker: HTMLElement
+
+  /** Custom event target */
+  protected eventTarget = new EventTarget()
+
   constructor({
     board,
     duration,
-    tooltip
+    tooltip,
+    databasePicker
   }: {
     board: HTMLCanvasElement
     duration: HTMLInputElement
     tooltip: HTMLElement
+    databasePicker: HTMLElement
   }) {
     this.$board = board
     this.$duration = duration
     this.$tooltip = tooltip
+    this.$databasePicker = databasePicker
 
     this.marker = new Marker(board, {
       x: [-1, 1],
@@ -76,29 +90,96 @@ export class HomeApp {
   async loadDatabase(): state {
     this.state = this.loadDatabase
 
-    const database: Database = await (await fetch('./db.json')).json()
+    // Load default databases
+    for (const [file, db] of await Promise.all<[string, Database]>(
+      defaultDatabases.map(async (file) =>
+        fetch(file) // Parallelly fetch files
+          .then(async (response) => response.json())
+          .then((db) => [file, db])
+      )
+    )) {
+      this.databases.set(file, db)
+    }
 
-    if (
-      typeof database !== 'object' ||
-      !('musixy' in database) ||
-      database.musixy !== 1
-    )
-      throw new Error('Wrong format')
+    this.loadedDatabases = new Set([defaultDatabases[0]])
+    this.axes = this.databases.get(defaultDatabases[0]).axes
+    this.checkedDatabases.set(this.axes.join('/'), this.loadedDatabases)
 
-    this.databases.set('db.json', database)
-    this.loadedDatabases = new Set(['db.json'])
+    this.hydrateDatabasePicker()
 
     return async () => this.loadMusics()
   }
 
+  /** Populates the database picker with all available databases */
+  hydrateDatabasePicker() {
+    const groups = new Map<string, string[]>()
+
+    this.$databasePicker.innerHTML = ''
+
+    for (const [name, db] of this.databases.entries()) {
+      const group = db.axes.join('/')
+      groups.set(group, [...(groups.get(group) ?? []), name])
+    }
+
+    for (const [i, dbs] of [...groups.values()].entries()) {
+      const $fieldset = document.createElement('fieldset')
+      const axes = this.databases.get(dbs.values().next().value as string).axes
+      const axesId = axes.join('/')
+
+      this.checkedDatabases.set(
+        axesId,
+        this.checkedDatabases.get(axesId) ?? new Set()
+      )
+
+      const $radio = document.createElement('input')
+      $radio.type = 'radio'
+      $radio.name = 'group'
+      $radio.id = `group-${i}`
+      $radio.checked = this.axes ? this.axes.join('/') === axesId : i === 0
+      const $label = document.createElement('label')
+      $label.htmlFor = $radio.id
+      $label.append(
+        $radio,
+        `↕ ${axes[0]} to ${axes[1]}, ↔ ${axes[2]} to ${axes[3]}`
+      )
+
+      $radio.addEventListener('input', () => {
+        if (!$radio.checked) return
+        this.loadedDatabases = this.checkedDatabases.get(axesId)
+        this.axes = axes
+        this.eventTarget.dispatchEvent(new CustomEvent('reloadDatabase'))
+      })
+
+      const $legend = document.createElement('legend')
+      $legend.append($label)
+      $fieldset.append($legend)
+
+      for (const [i, db] of dbs.entries()) {
+        const $p = document.createElement('p')
+        const $label = document.createElement('label')
+        const $checkbox = document.createElement('input')
+
+        $checkbox.type = 'checkbox'
+        $checkbox.id = `db-${i}`
+        $label.append($checkbox, db)
+        $p.append($label)
+        $fieldset.append($p)
+        $checkbox.checked = this.checkedDatabases.get(axesId).has(db)
+
+        $checkbox.addEventListener('input', () => {
+          const c = this.checkedDatabases.get(axesId)
+          if ($checkbox.checked) c.add(db)
+          else c.delete(db)
+          if (this.axes.join('/') === axesId) this.loadedDatabases = c
+          this.eventTarget.dispatchEvent(new CustomEvent('reloadDatabase'))
+        })
+      }
+
+      this.$databasePicker.append($fieldset)
+    }
+  }
+
   loadMusics(): () => state {
-    if (this.loadedDatabases.size === 0)
-      throw new Error('Load at least 1 database')
-
-    this.axes = this.databases.get(
-      this.loadedDatabases.values().next().value as string
-    ).axes
-
     this.musics = []
     for (const database of this.loadedDatabases)
       this.musics.push(...this.databases.get(database).musics)
@@ -120,6 +201,8 @@ export class HomeApp {
     return Promise.race([
       (async () => {
         const event = await listen(this.$board, 'click')
+        if (this.loadedDatabases.size === 0)
+          return async () => this.waitForFirstInput()
         const point: Vector = this.marker.fromCanvasPoint({
           x: event.offsetX,
           y: event.offsetY
@@ -170,11 +253,11 @@ export class HomeApp {
 
   async awaitReloadEvent(): Promise<() => state> {
     // Const $select: HTMLSelectElement = document.querySelector('#database')
-    await new Promise(() => {
-      void 0
+    await new Promise((resolve) => {
+      this.eventTarget.addEventListener('reloadDatabase', resolve, {once: true})
     })
     // This.databaseFile = $select.value
-    return async () => this.loadDatabase()
+    return async () => this.loadMusics()
   }
 
   /** Make a playlist based on the two points given */
@@ -434,6 +517,7 @@ export class HomeApp {
 const app = new HomeApp({
   board: document.querySelector('#board'),
   duration: document.querySelector('#duration'),
-  tooltip: document.querySelector('#duration-tooltip')
+  tooltip: document.querySelector('#duration-tooltip'),
+  databasePicker: document.querySelector('#database-picker')
 })
 void app.run()

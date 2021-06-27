@@ -25,12 +25,9 @@ layout: html.njk
 <p class="_center">
   <a href="{{ '/history/' | url }}">History</a>
 </p>
-<details>
+<details style="max-width:800px;margin:auto">
   <summary>Settings</summary>
-  <h2><input type="radio" name="x" id=""> ↕ Sad to Happy, ↔ Calm to Energetic</h2>
-  <p><input type="checkbox"> db.json</p>
-  <h2><input type="radio" name="x" id=""> ↕ Sad2 to Happy2, ↔ Calm2 to Energetic2</h2>
-  <p><input type="checkbox"> db2.json</p>
+  <div id="database-picker"></div>
   <hr>
   <p>Load a new database: <input type="text">
     <button>Load</button>
