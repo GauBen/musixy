@@ -2,3 +2,5 @@ node_modules/
 _dist
 _pre-dist
 _parcel-cache
+
+cypress/videos/
