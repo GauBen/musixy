@@ -2,17 +2,6 @@
   "name": "musixy",
   "version": "0.0.1",
   "author": "GauBen <benaim.gautier@gmail.com>",
-  "license": "MIT",
-  "scripts": {
-    "build": "yarn clean && yarn build:eleventy && yarn build:parcel",
-    "build:eleventy": "eleventy --pathprefix '/musixy/'",
-    "build:parcel": "PARCEL_WORKERS=0 parcel build '_pre-dist/**/*.html' --dist-dir _dist --cache-dir _parcel-cache --public-url '/musixy/'",
-    "clean": "rimraf _pre-dist _dist",
-    "start": "eleventy && npm-run-all --parallel watch:**",
-    "watch:eleventy": "eleventy --watch",
-    "watch:parcel": "PARCEL_WORKERS=0 parcel '_pre-dist/**/*.html' --dist-dir _dist --cache-dir _parcel-cache",
-    "test": "xo"
-  },
   "devDependencies": {
     "@11ty/eleventy": "1.0.0-canary.18",
     "@parcel/transformer-stylus": "2.0.0-beta.3.1",
@@ -24,6 +13,18 @@
     "parcel-reporter-static-files-copy": "^1.3.0",
     "rimraf": "^3.0.2",
     "xo": "^0.39.1"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "yarn clean && yarn build:eleventy && yarn build:parcel",
+    "build:eleventy": "eleventy --pathprefix '/musixy/'",
+    "build:parcel": "PARCEL_WORKERS=0 parcel build '_pre-dist/**/*.html' --dist-dir _dist --cache-dir _parcel-cache --public-url '/musixy/'",
+    "clean": "rimraf _pre-dist _dist",
+    "lint": "xo",
+    "start": "eleventy && npm-run-all --parallel watch:**",
+    "test": "cypress run",
+    "watch:eleventy": "eleventy --watch",
+    "watch:parcel": "PARCEL_WORKERS=0 parcel '_pre-dist/**/*.html' --dist-dir _dist --cache-dir _parcel-cache"
   },
   "volta": {
     "node": "16.0.0",
